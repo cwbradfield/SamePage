@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:social_book_app/components/textfield.dart';
+import 'package:social_book_app/components/login_textfield.dart';
 
 class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+  LoginPage({super.key});
+
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -16,21 +19,50 @@ class LoginPage extends StatelessWidget {
                 height: 50,
               ),
               Icon(
-                Icons.person,
-                size: 100,
+                Icons.menu_book_rounded,
+                size: 150,
               ),
               SizedBox(
-                height: 15,
+                height: 10,
               ),
               Text(
-                  style: TextStyle(fontSize: 24),
+                  style: TextStyle(fontSize: 26),
                   "Social Book App or something"),
               SizedBox(
-                height: 50,
+                height: 80,
               ),
-              MyTextfield(),
+              MyTextfield(
+                controller: usernameController,
+                hintText: "Username",
+                obscureText: false,
+              ),
               SizedBox(height: 12),
-              MyTextfield(),
+              MyTextfield(
+                controller: passwordController,
+                hintText: "Password",
+                obscureText: true,
+              ),
+              SizedBox(
+                height: 10,
+              ),
+              Text('Forgot Password?'),
+              SizedBox(
+                height: 30,
+              ),
+              ElevatedButton(
+                onPressed: () {},
+                child: Text('Sign In', style: TextStyle(color: Colors.black)),
+              ),
+              SizedBox(
+                height: 100,
+              ),
+              Text('Don\'t have an account?'),
+              ElevatedButton(
+                  onPressed: () {},
+                  child: Text(
+                    'Create Account',
+                    style: TextStyle(color: Colors.black),
+                  ))
             ],
           ),
         ),
