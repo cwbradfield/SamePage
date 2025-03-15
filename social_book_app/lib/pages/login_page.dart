@@ -17,20 +17,26 @@ class LoginPage extends StatelessWidget {
             child: Column(
               children: [
                 SizedBox(
-                  height: 50,
+                  height: 30,
                 ),
                 Icon(
                   Icons.menu_book_rounded,
-                  size: 150,
+                  size: 200,
+                  color: const Color.fromARGB(255, 66, 37, 10),
                 ),
-                SizedBox(
-                  height: 10,
-                ),
+                // SizedBox(
+                //   height: 10,
+                // ),
                 Text(
-                    style: TextStyle(fontSize: 26),
-                    "Social Book App or something"),
+                    style: TextStyle(
+                        fontSize: 64,
+                        fontWeight: FontWeight.w800,
+                        // Change font at some point
+                        fontFamily: '',
+                        color: const Color.fromARGB(255, 66, 37, 10)),
+                    "SamePage"),
                 SizedBox(
-                  height: 80,
+                  height: 60,
                 ),
                 MyTextfield(
                   controller: usernameController,
