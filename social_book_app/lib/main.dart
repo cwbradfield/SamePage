@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:social_book_app/pages/login_page.dart';
+import 'package:social_book_app/pages/auth_page.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 
@@ -17,11 +17,9 @@ class MainApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Scaffold(
-        body: Center(
-          child: LoginPage(),
-        ),
-      ),
+      // AuthPage displays LoginPage if not logged in
+      // or HomePage if logged in
+      home: AuthPage(),
     );
   }
 }

@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/login_textfield.dart';
 import 'package:social_book_app/pages/create_account_page.dart';
@@ -5,8 +6,15 @@ import 'package:social_book_app/pages/create_account_page.dart';
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
 
-  final usernameController = TextEditingController();
+  final emailController = TextEditingController();
   final passwordController = TextEditingController();
+
+  void signUserIn() async {
+    await FirebaseAuth.instance.signInWithEmailAndPassword(
+      email: emailController.text,
+      password: passwordController.text,
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -33,14 +41,14 @@ class LoginPage extends StatelessWidget {
                         fontSize: 64,
                         fontWeight: FontWeight.w800,
                         // Change font at some point
-                        fontFamily: '',
+                        // fontFamily: '',
                         color: const Color.fromARGB(255, 66, 37, 10)),
                     "SamePage"),
                 SizedBox(
                   height: 60,
                 ),
                 MyTextfield(
-                  controller: usernameController,
+                  controller: emailController,
                   hintText: "Email",
                   obscureText: false,
                 ),
@@ -61,7 +69,9 @@ class LoginPage extends StatelessWidget {
                   height: 30,
                 ),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    signUserIn();
+                  },
                   style: ButtonStyle(
                       backgroundColor:
                           WidgetStatePropertyAll<Color>(Colors.black87)),
