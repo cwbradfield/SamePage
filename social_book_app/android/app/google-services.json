@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "511172841554",
+    "project_id": "samepage-fcc7a",
+    "storage_bucket": "samepage-fcc7a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:511172841554:android:1237ac47aa2468fab20f8b",
+        "android_client_info": {
+          "package_name": "com.example.social_book_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWHgnEoCUy-cPiW39lVp3sh4PZboNjJgs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
