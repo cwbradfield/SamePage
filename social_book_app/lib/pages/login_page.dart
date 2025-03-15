@@ -34,7 +34,7 @@ class LoginPage extends StatelessWidget {
                 ),
                 MyTextfield(
                   controller: usernameController,
-                  hintText: "Username",
+                  hintText: "Email",
                   obscureText: false,
                 ),
                 SizedBox(height: 12),
@@ -46,24 +46,35 @@ class LoginPage extends StatelessWidget {
                 SizedBox(
                   height: 10,
                 ),
-                Text('Forgot Password?'),
+                Text(
+                  'Forgot Password?',
+                  style: TextStyle(color: Colors.white),
+                ),
                 SizedBox(
                   height: 30,
                 ),
                 ElevatedButton(
                   onPressed: () {},
-                  child: Text('Sign In', style: TextStyle(color: Colors.black)),
+                  style: ButtonStyle(
+                      backgroundColor:
+                          WidgetStatePropertyAll<Color>(Colors.black87)),
+                  child: Text('Sign In', style: TextStyle(color: Colors.white)),
                 ),
                 SizedBox(
                   height: 100,
                 ),
-                Text('Don\'t have an account?'),
-                ElevatedButton(
-                    onPressed: () {},
-                    child: Text(
-                      'Create Account',
-                      style: TextStyle(color: Colors.black),
-                    ))
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Don\'t have an account? '),
+                    GestureDetector(
+                      child: Text(
+                        'Create Account',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
