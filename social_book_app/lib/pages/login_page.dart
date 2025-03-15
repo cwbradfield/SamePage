@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/login_textfield.dart';
-import 'create_account_page.dart';
+import 'package:social_book_app/pages/create_account_page.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});

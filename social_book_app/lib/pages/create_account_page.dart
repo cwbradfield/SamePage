@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 
-class CreateAccountPage extends
-StatelessWidget {
+class CreateAccountPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
   @override
