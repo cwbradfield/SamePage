@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/login_textfield.dart';
+import 'create_account_page.dart';
 
 class LoginPage extends StatelessWidget {
   LoginPage({super.key});
@@ -27,7 +28,7 @@ class LoginPage extends StatelessWidget {
               ),
               Text(
                   style: TextStyle(fontSize: 26),
-                  "Social Book App or something"),
+                  "SamePage"),
               SizedBox(
                 height: 80,
               ),
@@ -58,7 +59,13 @@ class LoginPage extends StatelessWidget {
               ),
               Text('Don\'t have an account?'),
               ElevatedButton(
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: 
+                      (context) => CreateAccountPage()),
+                    );
+                  },
                   child: Text(
                     'Create Account',
                     style: TextStyle(color: Colors.black),
