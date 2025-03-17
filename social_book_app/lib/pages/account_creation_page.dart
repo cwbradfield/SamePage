@@ -3,20 +3,20 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/components/login_textfield.dart';
 import 'package:social_book_app/pages/login_or_create_user_page.dart';
 
-class LoginPage extends StatefulWidget {
+class AccountCreationPage extends StatefulWidget {
   final Function()? onTap;
-  const LoginPage({super.key, required this.onTap});
+  const AccountCreationPage({super.key, required this.onTap});
 
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<AccountCreationPage> createState() => _AccountCreationPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _AccountCreationPageState extends State<AccountCreationPage> {
   final emailController = TextEditingController();
-
   final passwordController = TextEditingController();
+  final confirmPasswordController = TextEditingController();
 
-  void signUserIn() async {
+  void createAccount() async {
     showDialog(
       context: context,
       barrierDismissible: false,
@@ -30,31 +30,38 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text,
-        password: passwordController.text,
-      );
-      Navigator.pop(context);
+      if (passwordController.text == confirmPasswordController.text) {
+        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+          email: emailController.text,
+          password: passwordController.text,
+        );
+        Navigator.pop(context);
+      } else {
+        if (context.mounted) {
+          Navigator.pop(context);
+        }
+        showErrorMessage('Passwords do not match');
+      }
     } on FirebaseAuthException catch (e) {
       if (context.mounted) {
         Navigator.pop(context);
       }
 
       if (e.code == 'invalid-credential') {
-        wrongCredentialMessage();
+        showErrorMessage(e.code);
       }
     }
   }
 
-  void wrongCredentialMessage() {
+  void showErrorMessage(String message) {
     showDialog(
       context: context,
       builder: (context) {
-        return const AlertDialog(
+        return AlertDialog(
           backgroundColor: Color.fromARGB(255, 66, 37, 10),
           title: Center(
             child: Text(
-              'Invalid Email or Password',
+              message,
               style: TextStyle(
                 color: Color.fromARGB(255, 186, 146, 109),
               ),
@@ -107,45 +114,44 @@ class _LoginPageState extends State<LoginPage> {
                   hintText: "Password",
                   obscureText: true,
                 ),
-                SizedBox(
-                  height: 10,
-                ),
-                Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: Colors.white),
+                SizedBox(height: 12),
+                MyTextfield(
+                  controller: confirmPasswordController,
+                  hintText: "Confirm Password",
+                  obscureText: true,
                 ),
                 SizedBox(
                   height: 30,
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    signUserIn();
+                    createAccount();
                   },
                   style: ButtonStyle(
                       backgroundColor:
                           WidgetStatePropertyAll<Color>(Colors.black87)),
-                  child: Text('Sign In', style: TextStyle(color: Colors.white)),
+                  child: Text('Create Account',
+                      style: TextStyle(color: Colors.white)),
                 ),
                 SizedBox(
-                  height: 100,
+                  height: 60,
                 ),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Don\'t have an account? '),
+                    Text('Already have an account? '),
                     GestureDetector(
                       onTap: () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => LoginOrCreatePage(),
-                          ),
+                              builder: (context) => LoginOrCreatePage()),
                         );
                       },
                       child: GestureDetector(
                         onTap: widget.onTap,
                         child: Text(
-                          'Create Account',
+                          'Sign In',
                           style: TextStyle(color: Colors.white),
                         ),
                       ),
