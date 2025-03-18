@@ -46,6 +46,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
       if (context.mounted) {
         Navigator.pop(context);
       }
+      showErrorMessage(e.code);
 
       if (e.code == 'invalid-credential') {
         showErrorMessage(e.code);
