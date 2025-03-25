@@ -10,10 +10,10 @@ class BookSearchScreen extends StatefulWidget {
   const BookSearchScreen({super.key});
 
   @override
-  _BookSearchScreenState createState() => _BookSearchScreenState();
+  BookSearchScreenState createState() => BookSearchScreenState();
 }
 
-class _BookSearchScreenState extends State<BookSearchScreen> {
+class BookSearchScreenState extends State<BookSearchScreen> {
   TextEditingController searchController = TextEditingController();
   bool searchByTitle = false;
   bool searchByAuthor = false;
