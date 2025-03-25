@@ -19,7 +19,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   bool searchByAuthor = false;
   bool searchByISBN = false;
 
-  List<Map<String, String>> books = [
+  List<Map<String, String>> books = [ // connect to firebase instead
     {"title": "The Hobbit", "author": "J.R.R. Tolkien", "isbn": "9780345339683"},
     {"title": "1984", "author": "George Orwell", "isbn": "9780451524935"},
     {"title": "Dune", "author": "Frank Herbert", "isbn": "9780441013593"},
