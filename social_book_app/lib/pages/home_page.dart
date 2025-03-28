@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_book_app/components/search.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -26,10 +27,17 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-      body: Center(
-        child: Text(
-          "Logged in as: ${user.email!}",
-          style: TextStyle(fontSize: 22),
+      body: SingleChildScrollView( // Center(
+        child: Column(crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Padding(padding: EdgeInsets.all(16),
+          child: Text(
+            "Logged in as: ${user.email!}",
+            style: TextStyle(fontSize: 22),
+        ),
+      ),
+      BookSearchScreen(),
+        ],
         ),
       ),
     );

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MaterialApp(
-    home: BookSearchScreen(),
-  ));
-}
+//void main() {
+//  runApp(MaterialApp(
+//    home: BookSearchScreen(),
+//  ));
+//}
 
 class BookSearchScreen extends StatefulWidget {
   const BookSearchScreen({super.key});
@@ -47,7 +47,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text("Book Search")),
+      //appBar: AppBar(title: Text("Book Search")),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
