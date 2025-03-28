@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 class CreateAccountPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
 
+  CreateAccountPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
