@@ -14,7 +14,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Color.fromARGB(255, 186, 146, 109),//Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 186, 146, 109),
         actions: [
@@ -103,9 +103,32 @@ class HomePage extends StatelessWidget {
             _buildFriendItem("Bob Smith", "bob@example.com"),
 
             // Book Search
+            // Padding(
+            //   padding: EdgeInsets.symmetric(vertical: 16),
+            //   child: BookSearchScreen(),
+            // ),
+            // Book Search Button
             Padding(
-              padding: EdgeInsets.symmetric(vertical: 16),
-              child: BookSearchScreen(),
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => BookSearchScreen()),
+                    );
+                  },
+                  icon: Icon(Icons.search),
+                  label: Text("Search for Books"),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.brown,
+                    foregroundColor: Colors.white,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    textStyle: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
             ),
           ],
         ),
