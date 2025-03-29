@@ -26,10 +26,23 @@ class HomePage extends StatelessWidget {
           )
         ],
       ),
-      body: Center(
-        child: Text(
-          "Logged in as: ${user.email!}",
-          style: TextStyle(fontSize: 22),
+      body: Padding(
+        padding: const EdgeInsets.all(24.0),
+        child: Column(
+          children: [
+            Text(
+              "Welcome, ${user.email!}",
+              style: TextStyle(fontSize: 22),
+            ),
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+              ),
+              child: Text("Current Books"),
+            ),
+          ],
         ),
       ),
     );
