@@ -1,3 +1,4 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 //void main() {
@@ -7,7 +8,13 @@ import 'package:flutter/material.dart';
 //}
 
 class BookSearchScreen extends StatefulWidget {
-  const BookSearchScreen({super.key});
+  BookSearchScreen({super.key});
+
+  final user = FirebaseAuth.instance.currentUser!;
+
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+  }
 
   @override
   BookSearchScreenState createState() => BookSearchScreenState();
@@ -47,6 +54,19 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Color.fromARGB(255, 186, 146, 109),//Colors.grey[200],
+      appBar: AppBar(
+        backgroundColor: Color.fromARGB(255, 186, 146, 109),
+        actions: [
+          IconButton(
+            onPressed: BookSearchScreen().signUserOut,
+            icon: Icon(
+              Icons.logout,
+              color: Color.fromARGB(255, 66, 37, 10),
+            ),
+          )
+        ],
+      ),
       //appBar: AppBar(title: Text("Book Search")),
       body: Padding(
         padding: EdgeInsets.all(16),
