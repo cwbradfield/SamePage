@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/login_textfield.dart';
 import 'package:social_book_app/pages/login_or_create_user_page.dart';
@@ -31,10 +32,18 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
 
     try {
       if (passwordController.text == confirmPasswordController.text) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
+
+        String uid = userCredential.user!.uid;
+        await FirebaseFirestore.instance.collection('Users').doc(uid).set({
+          'email': emailController.text,
+          'uid': uid,
+          'favoriteBooks': [],
+          'friends': [],
+        });
         Navigator.pop(context);
       } else {
         if (context.mounted) {
