@@ -36,11 +36,12 @@ class HomePage extends StatelessWidget {
               padding: EdgeInsets.all(16),
               child: Row(
                 children: [
-                  CircleAvatar(
-                    radius: 40,
-                    backgroundImage: NetworkImage(
-                        "https://via.placeholder.com/150"), // Placeholder profile pic
-                  ),
+                  // CircleAvatar(
+                  //   radius: 40,
+                  //   backgroundImage: NetworkImage(
+                  //       "https://via.placeholder.com/150"), // Placeholder profile pic
+                  // ),
+                  Icon(Icons.person),
                   SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -179,9 +180,11 @@ class HomePage extends StatelessWidget {
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Card(
         child: ListTile(
-          leading: CircleAvatar(
-            backgroundImage: NetworkImage("https://via.placeholder.com/100"),
-          ),
+          // leading: CircleAvatar(
+          //   backgroundImage: NetworkImage("https://via.placeholder.com/100"),
+          // ),
+
+          leading: Icon(Icons.person),
           title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
           subtitle: Text(email),
           trailing: IconButton(

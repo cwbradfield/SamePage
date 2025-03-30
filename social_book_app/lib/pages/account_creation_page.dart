@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/login_textfield.dart';
 import 'package:social_book_app/pages/login_or_create_user_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AccountCreationPage extends StatefulWidget {
   final Function()? onTap;
@@ -31,21 +32,32 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
 
     try {
       if (passwordController.text == confirmPasswordController.text) {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        UserCredential userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: emailController.text,
           password: passwordController.text,
         );
-        Navigator.pop(context);
-      } else {
-        if (context.mounted) {
-          Navigator.pop(context);
+
+        User? user = userCredential.user;
+
+        if (user != null) {
+          if (mounted && Navigator.canPop(context)) {
+            Navigator.of(context).pop();
+          }
+
+          await FirebaseFirestore.instance.collection('Users').add({
+            'uid': user.uid,
+            'email': user.email,
+          });
         }
+      } else {
+        if (!mounted) return;
+        Navigator.of(context).pop();
         showErrorMessage('Passwords do not match');
       }
     } on FirebaseAuthException catch (e) {
-      if (context.mounted) {
-        Navigator.pop(context);
-      }
+      if (!mounted) return;
+      Navigator.of(context).pop();
       showErrorMessage(e.code);
 
       if (e.code == 'invalid-credential') {
