@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_book_app/components/login_textfield.dart';
+import 'package:social_book_app/components/textfield.dart';
 import 'package:social_book_app/pages/login_or_create_user_page.dart';
 
 class LoginPage extends StatefulWidget {

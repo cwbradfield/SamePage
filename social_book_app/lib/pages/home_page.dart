@@ -1,6 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:social_book_app/components/search.dart';
+import 'package:social_book_app/pages/search.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
