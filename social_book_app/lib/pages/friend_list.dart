@@ -6,6 +6,8 @@ class FriendListScreen extends StatelessWidget {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  FriendListScreen({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

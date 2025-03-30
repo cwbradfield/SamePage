@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 class FriendProfileScreen extends StatelessWidget {
   final String friendEmail;
 
-  FriendProfileScreen({required this.friendEmail});
+  const FriendProfileScreen({super.key, required this.friendEmail});
 
   @override
   Widget build(BuildContext context) {

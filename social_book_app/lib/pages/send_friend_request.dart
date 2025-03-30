@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class SendFriendRequestScreen extends StatefulWidget {
+  const SendFriendRequestScreen({super.key});
+
   @override
   _SendFriendRequestScreenState createState() => _SendFriendRequestScreenState();
 }
@@ -75,7 +77,7 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
                   : firestore
                       .collection('Users')
                       .where('email', isGreaterThanOrEqualTo: searchQuery)
-                      .where('email', isLessThan: searchQuery + 'z')
+                      .where('email', isLessThan: '${searchQuery}z')
                       .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
