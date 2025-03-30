@@ -4,13 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/components/search.dart';
 
 class HomePage extends StatefulWidget {
-  HomePage({super.key});
+  const HomePage({super.key});
 
   @override
-  _HomePageState createState() => _HomePageState();
+  HomePageState createState() => HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
   late Future<DocumentSnapshot> userDoc;
 
@@ -105,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ...(userData['recentReviews'] as List<dynamic>? ?? [])
                     .map((review) => _buildReviewItem(review['book'], review['review']))
-                    .toList(),
+                    ,
 
                 // Friends List
                 Padding(
@@ -114,7 +114,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 ...(userData['friends'] as List<dynamic>? ?? [])
                     .map((friend) => _buildFriendItem(friend))
-                    .toList(),
+                    ,
 
                 // Book Search Button
                 Padding(
