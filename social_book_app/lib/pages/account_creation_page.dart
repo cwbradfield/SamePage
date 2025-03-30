@@ -45,19 +45,24 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
             Navigator.of(context).pop();
           }
 
-          await FirebaseFirestore.instance.collection('Users').add({
+          await FirebaseFirestore.instance
+              .collection("Users")
+              .doc(user.uid)
+              .set({
             'uid': user.uid,
             'email': user.email,
           });
         }
       } else {
-        if (!mounted) return;
-        Navigator.of(context).pop();
+        if (mounted && Navigator.canPop(context)) {
+          Navigator.of(context).pop();
+        }
         showErrorMessage('Passwords do not match');
       }
     } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
       showErrorMessage(e.code);
 
       if (e.code == 'invalid-credential') {

@@ -34,11 +34,13 @@ class _LoginPageState extends State<LoginPage> {
         email: emailController.text,
         password: passwordController.text,
       );
-      if (!mounted) return;
-      Navigator.of(context).pop();
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
     } on FirebaseAuthException catch (e) {
-      if (!mounted) return;
-      Navigator.of(context).pop();
+      if (mounted && Navigator.canPop(context)) {
+        Navigator.of(context).pop();
+      }
 
       if (e.code == 'invalid-credential') {
         wrongCredentialMessage();
