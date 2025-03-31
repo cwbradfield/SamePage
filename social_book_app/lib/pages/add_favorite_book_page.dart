@@ -16,7 +16,7 @@ class _AddFavoriteBookPageState extends State<AddFavoriteBookPage> {
   final authorController = TextEditingController();
   final isbnController = TextEditingController();
 
-  void addBook() async {
+  void addFavoriteBook() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
 
     Map<String, dynamic> newFavoriteBook = {
@@ -92,7 +92,7 @@ class _AddFavoriteBookPageState extends State<AddFavoriteBookPage> {
                       backgroundColor:
                           WidgetStatePropertyAll<Color>(Colors.black87)),
                   onPressed: () {
-                    addBook();
+                    addFavoriteBook();
                   },
                   child: Text(
                     "Add",

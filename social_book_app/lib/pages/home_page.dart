@@ -2,11 +2,18 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/add_favorite_book_page.dart';
+import 'package:social_book_app/pages/display_book_page.dart';
 import 'package:social_book_app/pages/search.dart';
+import 'package:social_book_app/database/database.dart';
 
-class HomePage extends StatelessWidget {
-  HomePage({super.key});
+class HomePage extends StatefulWidget {
+  const HomePage({super.key});
 
+  @override
+  State<HomePage> createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
 
   void signUserOut() {
@@ -73,14 +80,36 @@ class HomePage extends StatelessWidget {
             ),
             SizedBox(
               height: 120,
-              child: ListView(
-                scrollDirection: Axis.horizontal,
-                children: [
-                  _buildFavoriteBookCard("The Hobbit"),
-                  _buildFavoriteBookCard("1984"),
-                  _buildFavoriteBookCard("Dune"),
-                  _buildFavoriteBookCard("Harry Potter"),
-                ],
+              child: StreamBuilder<List<String>>(
+                stream: Database().getFavoriteBooks(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error loading books"));
+                  }
+
+                  List<String> bookTitles = snapshot.data ?? [];
+
+                  return ListView.builder(
+                    scrollDirection: Axis.horizontal,
+                    itemCount: bookTitles.length,
+                    itemBuilder: (context, index) {
+                      return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) =>
+
+                                        // DOES NOT WORK
+                                        DisplayBookPage()));
+                          },
+                          child: _buildFavoriteBookCard(bookTitles[index]));
+                    },
+                  );
+                },
               ),
             ),
 
@@ -165,19 +194,23 @@ class HomePage extends StatelessWidget {
 
   // Favorite Book Card Widget
   Widget _buildFavoriteBookCard(String title) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 8),
-      child: Card(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Padding(
-          padding: EdgeInsets.all(16),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.book, size: 40, color: Colors.brown),
-              SizedBox(height: 8),
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-            ],
+    return GestureDetector(
+      onTap: () {},
+      child: Padding(
+        padding: EdgeInsets.symmetric(horizontal: 8),
+        child: Card(
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+          child: Padding(
+            padding: EdgeInsets.all(16),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(Icons.book, size: 40, color: Colors.brown),
+                SizedBox(height: 8),
+                Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              ],
+            ),
           ),
         ),
       ),
