@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/components/search.dart';
 import 'friend_request.dart';
 import 'send_friend_request.dart';
+import 'friend_list.dart';
 
 class HomePage extends StatelessWidget {
   HomePage({super.key});
@@ -51,6 +52,19 @@ class HomePage extends StatelessWidget {
                   );
                 },
                 child: Text("Search for Books"),
+              ),
+            ),
+            // Button to go to Friend List Screen
+            Padding(
+              padding: EdgeInsets.all(8),
+              child: ElevatedButton(
+                onPressed: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FriendListScreen()),
+                  );
+                },
+                child: Text("View Friends"),
               ),
             ),
             // Button to go to Friend Requests Screen

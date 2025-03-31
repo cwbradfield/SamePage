@@ -1,25 +1,45 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'friend_profile.dart';
 
 class FriendListScreen extends StatelessWidget {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  FriendListScreen({super.key});
+  // Remove Friend Function
+  Future<void> removeFriend(String friendEmail) async {
+    var currentUserEmail = auth.currentUser!.email!;
+
+    try {
+      // Remove friend from current user's friend list
+      await firestore.collection('Users').doc(currentUserEmail).update({
+        'friends': FieldValue.arrayRemove([friendEmail])
+      });
+
+      // Remove current user from friend's friend list
+      await firestore.collection('Users').doc(friendEmail).update({
+        'friends': FieldValue.arrayRemove([currentUserEmail])
+      });
+
+      print("Friend removed successfully!");
+    } catch (e) {
+      print("Error removing friend: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text("My Friends")),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: firestore.collection('Users').doc(auth.currentUser!.uid).snapshots(),
+        stream: firestore.collection('Users').doc(auth.currentUser!.email).snapshots(),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+          if (!snapshot.hasData || !snapshot.data!.exists) {
+            return Center(child: Text("No user data found."));
           }
 
-          var userData = snapshot.data!.data() as Map<String, dynamic>;
+          var userData = snapshot.data?.data() as Map<String, dynamic>? ?? {};
           List<dynamic> friends = userData['friends'] ?? [];
 
           if (friends.isEmpty) {
@@ -35,8 +55,21 @@ class FriendListScreen extends StatelessWidget {
                 leading: CircleAvatar(child: Icon(Icons.person)),
                 title: Text(friendEmail),
                 onTap: () {
-                  // Navigate to friend's profile (to be implemented)
+                  // Navigate to Friend Profile Screen
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => FriendProfileScreen(friendEmail: friendEmail)),
+                  );
                 },
+                trailing: IconButton(
+                  icon: Icon(Icons.remove_circle, color: Colors.red),
+                  onPressed: () {
+                    removeFriend(friendEmail);
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Friend removed")),
+                    );
+                  },
+                ),
               );
             },
           );

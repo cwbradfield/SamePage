@@ -18,7 +18,7 @@ class FriendProfileScreen extends StatelessWidget {
           }
 
           var friendData = snapshot.data!.data() as Map<String, dynamic>;
-          String username = friendData['username'] ?? "Unknown User";
+          String username = friendData['email'] ?? "Unknown User";
           List<dynamic> reviews = friendData['reviews'] ?? [];
           List<dynamic> recommendations = friendData['recommendations'] ?? [];
 
