@@ -1,5 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_book_app/models/app_colors.dart';
+import 'package:social_book_app/pages/add_favorite_book_page.dart';
 import 'package:social_book_app/pages/search.dart';
 
 class HomePage extends StatelessWidget {
@@ -14,15 +16,15 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 186, 146, 109), //Colors.grey[200],
+      backgroundColor: AppColors().lightBrown,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 186, 146, 109),
+        backgroundColor: AppColors().lightBrown,
         actions: [
           IconButton(
             onPressed: signUserOut,
             icon: Icon(
               Icons.logout,
-              color: Color.fromARGB(255, 66, 37, 10),
+              color: AppColors().darkBrown,
             ),
           )
         ],
@@ -80,6 +82,28 @@ class HomePage extends StatelessWidget {
                   _buildFavoriteBookCard("Harry Potter"),
                 ],
               ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Center(
+                child: ElevatedButton(
+                  onPressed: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => AddFavoriteBookPage()));
+                  },
+                  child: Text(
+                    "Add a book",
+                    style: TextStyle(color: Colors.black),
+                  ),
+                ),
+              ),
+            ),
+
+            SizedBox(
+              height: 100,
             ),
 
             // Recent Reviews Section

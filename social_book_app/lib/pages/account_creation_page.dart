@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/textfield.dart';
+import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/login_or_create_user_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -22,9 +23,9 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return const Center(
+        return Center(
           child: CircularProgressIndicator(
-            color: Color.fromARGB(255, 186, 146, 109),
+            color: AppColors().lightBrown,
           ),
         );
       },
@@ -51,6 +52,8 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
               .set({
             'uid': user.uid,
             'email': user.email,
+            'favoriteBooks': [],
+            'friends': [],
           });
         }
       } else {
@@ -76,12 +79,12 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
       context: context,
       builder: (context) {
         return AlertDialog(
-          backgroundColor: Color.fromARGB(255, 66, 37, 10),
+          backgroundColor: AppColors().darkBrown,
           title: Center(
             child: Text(
               message,
               style: TextStyle(
-                color: Color.fromARGB(255, 186, 146, 109),
+                color: AppColors().lightBrown,
               ),
             ),
           ),
@@ -93,7 +96,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 186, 146, 109),
+      backgroundColor: AppColors().lightBrown,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -105,7 +108,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                 Icon(
                   Icons.menu_book_rounded,
                   size: 200,
-                  color: const Color.fromARGB(255, 66, 37, 10),
+                  color: AppColors().darkBrown,
                 ),
                 // SizedBox(
                 //   height: 10,
@@ -116,7 +119,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
                         fontWeight: FontWeight.w800,
                         // Change font at some point
                         // fontFamily: '',
-                        color: const Color.fromARGB(255, 66, 37, 10)),
+                        color: AppColors().darkBrown),
                     "SamePage"),
                 SizedBox(
                   height: 60,

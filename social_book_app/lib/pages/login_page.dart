@@ -2,6 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/components/textfield.dart';
 import 'package:social_book_app/pages/login_or_create_user_page.dart';
+import 'package:social_book_app/models/app_colors.dart';
 
 class LoginPage extends StatefulWidget {
   final Function()? onTap;
@@ -21,9 +22,9 @@ class _LoginPageState extends State<LoginPage> {
       context: context,
       barrierDismissible: false,
       builder: (context) {
-        return const Center(
+        return Center(
           child: CircularProgressIndicator(
-            color: Color.fromARGB(255, 186, 146, 109),
+            color: AppColors().lightBrown,
           ),
         );
       },
@@ -52,13 +53,13 @@ class _LoginPageState extends State<LoginPage> {
     showDialog(
       context: context,
       builder: (context) {
-        return const AlertDialog(
-          backgroundColor: Color.fromARGB(255, 66, 37, 10),
+        return AlertDialog(
+          backgroundColor: AppColors().darkBrown,
           title: Center(
             child: Text(
               'Invalid Email or Password',
               style: TextStyle(
-                color: Color.fromARGB(255, 186, 146, 109),
+                color: AppColors().lightBrown,
               ),
             ),
           ),
@@ -70,7 +71,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 186, 146, 109),
+      backgroundColor: AppColors().lightBrown,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -82,7 +83,7 @@ class _LoginPageState extends State<LoginPage> {
                 Icon(
                   Icons.menu_book_rounded,
                   size: 200,
-                  color: const Color.fromARGB(255, 66, 37, 10),
+                  color: AppColors().darkBrown,
                 ),
                 // SizedBox(
                 //   height: 10,
@@ -93,7 +94,7 @@ class _LoginPageState extends State<LoginPage> {
                         fontWeight: FontWeight.w800,
                         // Change font at some point
                         // fontFamily: '',
-                        color: const Color.fromARGB(255, 66, 37, 10)),
+                        color: AppColors().darkBrown),
                     "SamePage"),
                 SizedBox(
                   height: 60,
