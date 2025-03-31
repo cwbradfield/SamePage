@@ -117,6 +117,8 @@ class _HomePageState extends State<HomePage> {
               padding: const EdgeInsets.all(24.0),
               child: Center(
                 child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
                   onPressed: () {
                     Navigator.push(
                         context,
@@ -125,7 +127,7 @@ class _HomePageState extends State<HomePage> {
                   },
                   child: Text(
                     "Add a book",
-                    style: TextStyle(color: Colors.black),
+                    style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
@@ -194,23 +196,19 @@ class _HomePageState extends State<HomePage> {
 
   // Favorite Book Card Widget
   Widget _buildFavoriteBookCard(String title) {
-    return GestureDetector(
-      onTap: () {},
-      child: Padding(
-        padding: EdgeInsets.symmetric(horizontal: 8),
-        child: Card(
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-          child: Padding(
-            padding: EdgeInsets.all(16),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(Icons.book, size: 40, color: Colors.brown),
-                SizedBox(height: 8),
-                Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-              ],
-            ),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 8),
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.book, size: 40, color: Colors.brown),
+              SizedBox(height: 8),
+              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+            ],
           ),
         ),
       ),
