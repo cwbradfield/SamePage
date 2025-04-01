@@ -135,7 +135,7 @@ class _HomePageState extends State<HomePage> {
             ),
 
             SizedBox(
-              height: 100,
+              height: 20,
             ),
 
             // Recent Reviews Section
