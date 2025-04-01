@@ -3,8 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/add_favorite_book_page.dart';
 import 'package:social_book_app/pages/display_book_page.dart';
+import 'package:social_book_app/pages/friend_list.dart';
+import 'package:social_book_app/pages/friend_request.dart';
 import 'package:social_book_app/pages/search.dart';
 import 'package:social_book_app/database/database.dart';
+import 'package:social_book_app/pages/send_friend_request.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -135,37 +138,36 @@ class _HomePageState extends State<HomePage> {
             ),
 
             SizedBox(
-              height: 20,
+              height: 10,
             ),
+
+            //    MAYBE IMPLEMENT LATER????
+            //
+            //
+            //
 
             // Recent Reviews Section
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                "📝 Recent Reviews",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            _buildReviewItem("The Hobbit", "Loved the adventure! 🌟🌟🌟🌟🌟"),
-            _buildReviewItem("Dune", "A masterpiece of sci-fi. 🌟🌟🌟🌟"),
-
-            // Friends List
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                "👥 Friends",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            _buildFriendItem("Alice Johnson", "alice@example.com"),
-            _buildFriendItem("Bob Smith", "bob@example.com"),
-
-            // Book Search
             // Padding(
-            //   padding: EdgeInsets.symmetric(vertical: 16),
-            //   child: BookSearchScreen(),
+            //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //   child: Text(
+            //     "📝 Recent Reviews",
+            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //   ),
             // ),
-            // Book Search Button
+            // _buildReviewItem("The Hobbit", "Loved the adventure! 🌟🌟🌟🌟🌟"),
+            // _buildReviewItem("Dune", "A masterpiece of sci-fi. 🌟🌟🌟🌟"),
+
+            // // Friends List
+            // Padding(
+            //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            //   child: Text(
+            //     "👥 Friends",
+            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            //   ),
+            // ),
+            // _buildFriendItem("Alice Johnson", "alice@example.com"),
+            // _buildFriendItem("Bob Smith", "bob@example.com"),
+
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               child: SizedBox(
@@ -181,11 +183,74 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.search),
                   label: Text("Search for Books"),
                   style: ElevatedButton.styleFrom(
+                    iconColor: AppColors().darkBrown,
                     backgroundColor: Colors.brown,
-                    foregroundColor: Colors.white,
+                    foregroundColor: Colors.black,
                     padding: EdgeInsets.symmetric(vertical: 12),
                     textStyle: TextStyle(fontSize: 18),
                   ),
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FriendListScreen()),
+                    );
+                  },
+                  child: Text("View Friends",
+                      style: TextStyle(color: Colors.white)),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => FriendRequestsScreen()),
+                    );
+                  },
+                  child: Text(
+                    "View Friend Requests",
+                    style: TextStyle(color: Colors.white),
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ButtonStyle(
+                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => SendFriendRequestScreen()),
+                    );
+                  },
+                  child: Text("Add Friends",
+                      style: TextStyle(color: Colors.white)),
                 ),
               ),
             ),
