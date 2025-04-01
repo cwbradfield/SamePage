@@ -84,7 +84,10 @@ class _HomePageState extends State<HomePage> {
                 stream: Database().getFavoriteBooks(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(child: CircularProgressIndicator());
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors().darkBrown,
+                    ));
                   }
                   if (snapshot.hasError) {
                     return Center(child: Text("Error loading books"));
@@ -101,10 +104,8 @@ class _HomePageState extends State<HomePage> {
                             Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) =>
-
-                                        // DOES NOT WORK
-                                        DisplayBookPage()));
+                                    builder: (context) => DisplayBookPage(
+                                        title: bookTitles[index])));
                           },
                           child: _buildFavoriteBookCard(bookTitles[index]));
                     },

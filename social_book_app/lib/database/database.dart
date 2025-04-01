@@ -15,4 +15,10 @@ class Database {
           .toList();
     });
   }
+
+  Stream<List<String>> getAllReviews(String bookTitle) {
+    return _firestore.collection('Reviews').snapshots().map((snapshot) {
+      return snapshot.docs.map((doc) => doc['review'] as String).toList();
+    });
+  }
 }

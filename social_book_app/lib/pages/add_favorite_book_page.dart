@@ -18,6 +18,7 @@ class _AddFavoriteBookPageState extends State<AddFavoriteBookPage> {
 
   void addFavoriteBook() async {
     String uid = FirebaseAuth.instance.currentUser!.uid;
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
 
     Map<String, dynamic> newFavoriteBook = {
       'title': titleController.text,
@@ -26,7 +27,7 @@ class _AddFavoriteBookPageState extends State<AddFavoriteBookPage> {
     };
 
     try {
-      await FirebaseFirestore.instance.collection("Users").doc(uid).update({
+      await firestore.collection("Users").doc(uid).update({
         'favoriteBooks': FieldValue.arrayUnion([newFavoriteBook])
       });
 
