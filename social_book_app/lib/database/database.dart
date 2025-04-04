@@ -10,14 +10,23 @@ class Database {
     return _firestore.collection('Users').doc(uid).snapshots().map((snapshot) {
       List<dynamic> favoriteBooks = snapshot['favoriteBooks'] ?? [];
 
-      return favoriteBooks
-          .map((favoriteBook) => favoriteBook['title'] as String)
-          .toList();
+      return favoriteBooks.map((favoriteBook) => favoriteBook['title'] as String).toList();
+    });
+  }
+
+  Stream<List<String>> getFriends() {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+
+    return _firestore.collection('Users').doc(uid).snapshots().map((snapshot) {
+      List<dynamic> friends = snapshot['friends'] ?? [];
+
+      return friends.map((friend) => friend['email'] as String).toList();
     });
   }
 
   Stream<List<String>> getAllReviews(String bookTitle) {
-    return _firestore.collection('Reviews').snapshots().map((snapshot) {
+    return _firestore.collection('Reviews').where(
+      'title',isEqualTo: bookTitle).snapshots().map((snapshot) {
       return snapshot.docs.map((doc) => doc['review'] as String).toList();
     });
   }

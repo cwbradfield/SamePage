@@ -8,6 +8,8 @@ class FriendListScreen extends StatelessWidget {
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
+  FriendListScreen({super.key});
+
   // Remove Friend Function
   Future<void> removeFriend(String friendEmail) async {
     var currentUserEmail = auth.currentUser!.email!;
@@ -38,10 +40,7 @@ class FriendListScreen extends StatelessWidget {
         backgroundColor: AppColors().lightBrown,
       ),
       body: StreamBuilder<DocumentSnapshot>(
-        stream: firestore
-            .collection('Users')
-            .doc(auth.currentUser!.email)
-            .snapshots(),
+        stream: firestore.collection('Users').doc(auth.currentUser!.email).snapshots(),
         builder: (context, snapshot) {
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return Center(child: Text("No user data found."));

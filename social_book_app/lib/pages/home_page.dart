@@ -1,4 +1,5 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/add_favorite_book_page.dart';
@@ -18,9 +19,31 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
+  final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
+  }
+
+// Remove Friend Function
+  Future<void> removeFriend(String friendEmail) async {
+    var currentUserEmail = user.email!;
+
+    try {
+      // Remove friend from current user's friend list
+      await firestore.collection('Users').doc(currentUserEmail).update({
+        'friends': FieldValue.arrayRemove([friendEmail])
+      });
+
+      // Remove current user from friend's friend list
+      await firestore.collection('Users').doc(friendEmail).update({
+        'friends': FieldValue.arrayRemove([currentUserEmail])
+      });
+
+      print("Friend removed successfully!");
+    } catch (e) {
+      print("Error removing friend: $e");
+    }
   }
 
   @override
@@ -157,17 +180,42 @@ class _HomePageState extends State<HomePage> {
             // _buildReviewItem("The Hobbit", "Loved the adventure! 🌟🌟🌟🌟🌟"),
             // _buildReviewItem("Dune", "A masterpiece of sci-fi. 🌟🌟🌟🌟"),
 
-            // // Friends List
-            // Padding(
-            //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //   child: Text(
-            //     "👥 Friends",
-            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-            // _buildFriendItem("Alice Johnson", "alice@example.com"),
-            // _buildFriendItem("Bob Smith", "bob@example.com"),
+            // Friends List
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                "👥 Friends",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 200,
+              child: StreamBuilder<List<String>>(
+                stream: Database().getFriends(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors().darkBrown,
+                    ));
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error loading friends"));
+                  }
 
+                  List<String> friends = snapshot.data ?? [];
+
+                  return ListView.builder(
+                    itemCount: friends.length,
+                    itemBuilder: (context, index) {
+                      return _buildFriendItem(friends[index], friends[index]);
+                    },
+                  );
+                },
+              ),
+            ),
+
+            // Book Search
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
               child: SizedBox(
@@ -195,25 +243,29 @@ class _HomePageState extends State<HomePage> {
             SizedBox(
               height: 20,
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FriendListScreen()),
-                    );
-                  },
-                  child: Text("View Friends",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-            ),
+
+            // View Friends
+            // Padding(
+            //   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
+            //   child: SizedBox(
+            //     width: double.infinity,
+            //     child: ElevatedButton(
+            //       style: ButtonStyle(
+            //           backgroundColor: WidgetStatePropertyAll(Colors.black87)),
+            //       onPressed: () {
+            //         Navigator.push(
+            //           context,
+            //           MaterialPageRoute(
+            //               builder: (context) => FriendListScreen()),
+            //         );
+            //       },
+            //       child: Text("View Friends",
+            //           style: TextStyle(color: Colors.white)),
+            //     ),
+            //   ),
+            // ),
+
+            // Friend Requests
             Padding(
               padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
               child: SizedBox(
@@ -235,6 +287,8 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+
+            // Add Friends
             Padding(
               padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
               child: SizedBox(
@@ -311,7 +365,8 @@ class _HomePageState extends State<HomePage> {
           trailing: IconButton(
             icon: Icon(Icons.person_add, color: Colors.blue),
             onPressed: () {
-              // TODO: Implement add friend functionality
+              Navigator.push(context,MaterialPageRoute(
+                builder: (context) => FriendRequestsScreen()));
             },
           ),
         ),
