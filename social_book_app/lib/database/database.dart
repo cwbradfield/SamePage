@@ -30,4 +30,19 @@ class Database {
       return snapshot.docs.map((doc) => doc['review'] as String).toList();
     });
   }
+  Stream<List<Map<String, dynamic>>> getUserReviews() {
+    String uid = FirebaseAuth.instance.currentUser!.uid;
+
+    return _firestore.collection('Users').doc(uid).snapshots().map((snapshot) {
+      List<dynamic> reviews = snapshot.data()?['Reviews'] ?? [];
+
+      // Convert each item to a map with title and review
+    return reviews.map<Map<String, dynamic>>((review) {
+      return {
+        'title': review['title'] ?? 'Unknown Title',
+        'review': review['review'] ?? '',
+      };
+    }).take(3).toList();
+    });
+  }
 }

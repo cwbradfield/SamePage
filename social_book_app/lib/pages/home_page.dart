@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/add_favorite_book_page.dart';
 import 'package:social_book_app/pages/display_book_page.dart';
-import 'package:social_book_app/pages/friend_list.dart';
 import 'package:social_book_app/pages/friend_request.dart';
 import 'package:social_book_app/pages/search.dart';
 import 'package:social_book_app/database/database.dart';
@@ -23,27 +22,6 @@ class _HomePageState extends State<HomePage> {
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
-  }
-
-// Remove Friend Function
-  Future<void> removeFriend(String friendEmail) async {
-    var currentUserEmail = user.email!;
-
-    try {
-      // Remove friend from current user's friend list
-      await firestore.collection('Users').doc(currentUserEmail).update({
-        'friends': FieldValue.arrayRemove([friendEmail])
-      });
-
-      // Remove current user from friend's friend list
-      await firestore.collection('Users').doc(friendEmail).update({
-        'friends': FieldValue.arrayRemove([currentUserEmail])
-      });
-
-      print("Friend removed successfully!");
-    } catch (e) {
-      print("Error removing friend: $e");
-    }
   }
 
   @override
@@ -87,7 +65,7 @@ class _HomePageState extends State<HomePage> {
                             fontSize: 22, fontWeight: FontWeight.bold),
                       ),
                       Text(
-                        "📖 Avid Reader | Book Lover",
+                        "📖 Avid Reader | Book Lover", // should add DB field for profile text/byline
                         style: TextStyle(fontSize: 16, color: Colors.grey[700]),
                       ),
                     ],
@@ -153,32 +131,74 @@ class _HomePageState extends State<HomePage> {
                             builder: (context) => AddFavoriteBookPage()));
                   },
                   child: Text(
-                    "Add a book",
+                    "Add a favorite book",
                     style: TextStyle(color: Colors.white),
                   ),
                 ),
               ),
             ),
 
-            SizedBox(
-              height: 10,
-            ),
-
-            //    MAYBE IMPLEMENT LATER????
-            //
-            //
-            //
-
             // Recent Reviews Section
-            // Padding(
-            //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //   child: Text(
-            //     "📝 Recent Reviews",
-            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+              child: Text(
+                "📝 Recent Reviews",
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(
+              height: 20,
+              child: StreamBuilder<List<Map<String, dynamic>>>(
+                stream: Database().getUserReviews(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Center(
+                        child: CircularProgressIndicator(
+                      color: AppColors().darkBrown,
+                    ));
+                  }
+                  if (snapshot.hasError) {
+                    return Center(child: Text("Error loading reviews"));
+                  }
+
+                  final reviews = snapshot.data!;
+
+                  return ListView(
+                    children: reviews.map((entry) {
+                      return _buildReviewItem(entry['title'], entry['review']);
+                    }).toList(),
+                  );
+                },
+              ),
+            ),
             // _buildReviewItem("The Hobbit", "Loved the adventure! 🌟🌟🌟🌟🌟"),
             // _buildReviewItem("Dune", "A masterpiece of sci-fi. 🌟🌟🌟🌟"),
+
+            // Book Search
+            Padding(
+              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton.icon(
+                  onPressed: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => BookSearchScreen()),
+                    );
+                  },
+                  icon: Icon(Icons.search),
+                  label: Text("Search for Books"),
+                  style: ElevatedButton.styleFrom(
+                    iconColor: AppColors().darkBrown,
+                    backgroundColor: Colors.brown,
+                    foregroundColor: Colors.black,
+                    padding: EdgeInsets.symmetric(vertical: 12),
+                    textStyle: TextStyle(fontSize: 18),
+                  ),
+                ),
+              ),
+            ),
 
             // Friends List
             Padding(
@@ -208,43 +228,14 @@ class _HomePageState extends State<HomePage> {
                   return ListView.builder(
                     itemCount: friends.length,
                     itemBuilder: (context, index) {
-                      return _buildFriendItem(friends[index], friends[index]);
+                      return _buildFriendItem(friends[index]);
                     },
                   );
                 },
               ),
             ),
 
-            // Book Search
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => BookSearchScreen()),
-                    );
-                  },
-                  icon: Icon(Icons.search),
-                  label: Text("Search for Books"),
-                  style: ElevatedButton.styleFrom(
-                    iconColor: AppColors().darkBrown,
-                    backgroundColor: Colors.brown,
-                    foregroundColor: Colors.black,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    textStyle: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ),
-            ),
-            SizedBox(
-              height: 20,
-            ),
-
-            // View Friends
+            // View Friends  --no longer needed if above friends list works
             // Padding(
             //   padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
             //   child: SizedBox(
@@ -350,7 +341,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Friend Item Widget
-  Widget _buildFriendItem(String name, String email) {
+  Widget _buildFriendItem(String email) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: Card(
@@ -360,15 +351,15 @@ class _HomePageState extends State<HomePage> {
           // ),
 
           leading: Icon(Icons.person),
-          title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(email),
-          trailing: IconButton(
-            icon: Icon(Icons.person_add, color: Colors.blue),
-            onPressed: () {
-              Navigator.push(context,MaterialPageRoute(
-                builder: (context) => FriendRequestsScreen()));
-            },
-          ),
+          title: Text(email, style: TextStyle(fontWeight: FontWeight.bold)),
+          
+          // trailing: IconButton(  --could potentially be used in send_friend_request to add friend
+          //   icon: Icon(Icons.person_add, color: Colors.blue),
+          //   onPressed: () {
+          //     Navigator.push(context,MaterialPageRoute(
+          //       builder: (context) => FriendRequestsScreen()));
+          //   },
+          // ),
         ),
       ),
     );

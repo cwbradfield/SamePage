@@ -1,11 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-
-//void main() {
-//  runApp(MaterialApp(
-//    home: BookSearchScreen(),
-//  ));
-//}
 
 class BookSearchScreen extends StatefulWidget {
   BookSearchScreen({super.key});
@@ -26,30 +21,46 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   bool searchByAuthor = false;
   bool searchByISBN = false;
 
-  List<Map<String, String>> books = [ // connect to firebase instead
-    {"title": "The Hobbit", "author": "J.R.R. Tolkien", "isbn": "9780345339683"},
-    {"title": "1984", "author": "George Orwell", "isbn": "9780451524935"},
-    {"title": "Dune", "author": "Frank Herbert", "isbn": "9780441013593"},
-  ];
-
   List<Map<String, String>> filteredBooks = [];
 
-  void searchBooks() {
-    String query = searchController.text.toLowerCase();
+  void searchBooks() async {
+  String query = searchController.text.toLowerCase();
 
-    setState(() {
-      filteredBooks = books.where((book) {
-        if (!searchByTitle && !searchByAuthor && !searchByISBN) {
-          // If no filters selected, search all fields
-          return book.values.any((value) => value.toLowerCase().contains(query));
-        }
-        // Apply selected filters
-        return (searchByTitle && book["title"]!.toLowerCase().contains(query)) ||
-               (searchByAuthor && book["author"]!.toLowerCase().contains(query)) ||
-               (searchByISBN && book["isbn"]!.toLowerCase().contains(query));
-      }).toList();
-    });
+  Query firestoreQuery = FirebaseFirestore.instance.collection('Books');
+
+  if (query.isEmpty) {
+    setState(() => filteredBooks = []);
+    return;
   }
+
+  if (searchByTitle) {
+    firestoreQuery = firestoreQuery
+        .where('title', isGreaterThanOrEqualTo: query);
+        //.where('title', isLessThanOrEqualTo: '$query\uf8ff');
+  } else if (searchByAuthor) {
+    firestoreQuery = firestoreQuery
+        .where('author', isGreaterThanOrEqualTo: query);
+        //.where('author', isLessThanOrEqualTo: '$query\uf8ff');
+  } else if (searchByISBN) {
+    firestoreQuery = firestoreQuery
+        .where('isbn', isGreaterThanOrEqualTo: query);
+        //.where('isbn', isLessThanOrEqualTo: '$query\uf8ff');
+  }
+
+  final snapshot = await firestoreQuery.get();
+
+  setState(() {
+    filteredBooks = snapshot.docs.map((doc) {
+      final data = doc.data() as Map<String, dynamic>;
+      return {
+        "title": (data['title'] ?? '').toString(),
+        "author": (data['author'] ?? '').toString(),
+        "isbn": (data['isbn'] ?? '').toString(),
+      };
+    }).toList();
+  });
+}
+
 
   @override
   Widget build(BuildContext context) {
