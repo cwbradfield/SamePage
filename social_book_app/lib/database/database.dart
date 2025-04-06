@@ -18,9 +18,10 @@ class Database {
     String uid = FirebaseAuth.instance.currentUser!.uid;
 
     return _firestore.collection('Users').doc(uid).snapshots().map((snapshot) {
-      List<dynamic> friends = snapshot['friends'] ?? [];
+      List<dynamic> friends = snapshot.data()?['friends'] ?? [];
 
-      return friends.map((friend) => friend['email'] as String).toList();
+      //return friends.map((friend) => friend as String).toList();
+      return friends.cast<String>().toList();
     });
   }
 
@@ -30,6 +31,7 @@ class Database {
       return snapshot.docs.map((doc) => doc['review'] as String).toList();
     });
   }
+  
   Stream<List<Map<String, dynamic>>> getUserReviews() {
     String uid = FirebaseAuth.instance.currentUser!.uid;
 

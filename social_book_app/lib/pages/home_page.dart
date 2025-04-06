@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/add_favorite_book_page.dart';
 import 'package:social_book_app/pages/display_book_page.dart';
+import 'package:social_book_app/pages/friend_profile.dart';
 import 'package:social_book_app/pages/friend_request.dart';
 import 'package:social_book_app/pages/search.dart';
 import 'package:social_book_app/database/database.dart';
@@ -226,9 +227,17 @@ class _HomePageState extends State<HomePage> {
                   List<String> friends = snapshot.data ?? [];
 
                   return ListView.builder(
+                    scrollDirection: Axis.vertical,
                     itemCount: friends.length,
                     itemBuilder: (context, index) {
-                      return _buildFriendItem(friends[index]);
+                      return GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => FriendProfileScreen(friendEmail: friends[index],)));
+                          },
+                          child: _buildFriendItem(friends[index]));
                     },
                   );
                 },
