@@ -1,15 +1,11 @@
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:social_book_app/database/database.dart';
 
 class BookSearchScreen extends StatefulWidget {
   BookSearchScreen({super.key});
 
   final user = FirebaseAuth.instance.currentUser!;
-
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
 
   @override
   BookSearchScreenState createState() => BookSearchScreenState();
@@ -17,51 +13,41 @@ class BookSearchScreen extends StatefulWidget {
 
 class BookSearchScreenState extends State<BookSearchScreen> {
   TextEditingController searchController = TextEditingController();
-  bool searchByTitle = false;
-  bool searchByAuthor = false;
-  bool searchByISBN = false;
+  List<Map<String, dynamic>> filteredBooks = [];
 
-  List<Map<String, String>> filteredBooks = [];
+  void signUserOut() {
+    FirebaseAuth.instance.signOut();
+  }
 
   void searchBooks() async {
-  String query = searchController.text.toLowerCase();
+    String query = searchController.text.toLowerCase();
+    final books = await Database().fetchBooksOnce();
 
-  Query firestoreQuery = FirebaseFirestore.instance.collection('Books');
+    setState(() {
+      filteredBooks = books.where((book) {
+        return book['title'].toLowerCase().contains(query) ||
+               book['author'].toLowerCase().contains(query) ||
+               book['isbn'].contains(query);}).toList();
+  
+    // StreamBuilder<List<Map<String, dynamic>>>(
+    // stream: Database().getBooks(),
+    // builder: (context, snapshot) {
+    //   if (!snapshot.hasData) {
+    //     return CircularProgressIndicator();
+    //   }
 
-  if (query.isEmpty) {
-    setState(() => filteredBooks = []);
-    return;
+    //   final books = snapshot.data!;
+    //   filteredBooks = books.where((book) {
+    //     final queryLower = query.toLowerCase();
+    //     return book['title'].toLowerCase().contains(queryLower) ||
+    //            book['author'].toLowerCase().contains(queryLower) ||
+    //            book['isbn'].contains(query);
+    //   }).toList();
+
+    //   return SizedBox.shrink(); // Return an empty widget as a placeholder
+    });
   }
-
-  if (searchByTitle) {
-    firestoreQuery = firestoreQuery
-        .where('title', isGreaterThanOrEqualTo: query);
-        //.where('title', isLessThanOrEqualTo: '$query\uf8ff');
-  } else if (searchByAuthor) {
-    firestoreQuery = firestoreQuery
-        .where('author', isGreaterThanOrEqualTo: query);
-        //.where('author', isLessThanOrEqualTo: '$query\uf8ff');
-  } else if (searchByISBN) {
-    firestoreQuery = firestoreQuery
-        .where('isbn', isGreaterThanOrEqualTo: query);
-        //.where('isbn', isLessThanOrEqualTo: '$query\uf8ff');
-  }
-
-  final snapshot = await firestoreQuery.get();
-
-  setState(() {
-    filteredBooks = snapshot.docs.map((doc) {
-      final data = doc.data() as Map<String, dynamic>;
-      return {
-        "title": (data['title'] ?? '').toString(),
-        "author": (data['author'] ?? '').toString(),
-        "isbn": (data['isbn'] ?? '').toString(),
-      };
-    }).toList();
-  });
-}
-
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -70,7 +56,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
         backgroundColor: Color.fromARGB(255, 186, 146, 109),
         actions: [
           IconButton(
-            onPressed: BookSearchScreen().signUserOut,
+            onPressed: signUserOut,
             icon: Icon(
               Icons.logout,
               color: Color.fromARGB(255, 66, 37, 10),
@@ -86,7 +72,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
             TextField(
               controller: searchController,
               decoration: InputDecoration(
-                labelText: "Search Books",
+                labelText: "Search Books by Title, Author, or ISBN",
                 border: OutlineInputBorder(),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
@@ -95,41 +81,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
               ),
               onChanged: (value) => searchBooks(),
             ),
-            SizedBox(height: 10),
-            Row(
-              children: [
-                Expanded(
-                  child: CheckboxListTile(
-                    title: Text("Title"),
-                    value: searchByTitle,
-                    onChanged: (value) {
-                      setState(() => searchByTitle = value!);
-                      searchBooks();
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: CheckboxListTile(
-                    title: Text("Author"),
-                    value: searchByAuthor,
-                    onChanged: (value) {
-                      setState(() => searchByAuthor = value!);
-                      searchBooks();
-                    },
-                  ),
-                ),
-                Expanded(
-                  child: CheckboxListTile(
-                    title: Text("ISBN"),
-                    value: searchByISBN,
-                    onChanged: (value) {
-                      setState(() => searchByISBN = value!);
-                      searchBooks();
-                    },
-                  ),
-                ),
-              ],
-            ),
+            
             SizedBox(height: 10),
             Expanded(
               child: ListView.builder(

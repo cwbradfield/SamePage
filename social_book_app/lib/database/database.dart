@@ -32,6 +32,32 @@ class Database {
     });
   }
   
+Future<List<Map<String, dynamic>>> fetchBooksOnce() async {
+  final snapshot = await _firestore.collection('Books').get();
+  return snapshot.docs.map((doc) {
+    final data = doc.data();
+    return {
+      'title': (data['title'] ?? '').toString(),
+      'author': (data['author'] ?? '').toString(),
+      'isbn': (data['isbn'] ?? '').toString(),
+    };
+  }).toList();
+}
+
+  // Stream<List<Map<String, dynamic>>> getBooks() {
+    
+  //   return _firestore.collection('Books').snapshots().map((snapshot) {
+  //     return snapshot.docs.map((doc) {
+  //       final data = doc.data();
+  //       return {
+  //         'title': (data['title'] ?? '').toString(),
+  //         'author': (data['author'] ?? '').toString(),
+  //         'isbn': (data['isbn'] ?? '').toString(),
+  //       };
+  //     }).toList();
+  //   });
+  // }
+
   Stream<List<Map<String, dynamic>>> getUserReviews() {
     String uid = FirebaseAuth.instance.currentUser!.uid;
 
