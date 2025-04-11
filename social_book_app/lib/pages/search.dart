@@ -1,11 +1,8 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_book_app/models/book_model.dart';
+import 'package:social_book_app/services/google_books_service.dart';
 
-//void main() {
-//  runApp(MaterialApp(
-//    home: BookSearchScreen(),
-//  ));
-//}
 
 class BookSearchScreen extends StatefulWidget {
   BookSearchScreen({super.key});
@@ -26,29 +23,57 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   bool searchByAuthor = false;
   bool searchByISBN = false;
 
-  List<Map<String, String>> books = [ // connect to firebase instead
-    {"title": "The Hobbit", "author": "J.R.R. Tolkien", "isbn": "9780345339683"},
-    {"title": "1984", "author": "George Orwell", "isbn": "9780451524935"},
-    {"title": "Dune", "author": "Frank Herbert", "isbn": "9780441013593"},
-  ];
+  final GoogleBooksService _booksService = GoogleBooksService();
+  // bool _apiTested = false; // Just had this in there for testing purposes
+  // String _apiTestResult = "";
 
-  List<Map<String, String>> filteredBooks = [];
+  List<Book> books = [];
+  List<Book> filteredBooks = [];
 
-  void searchBooks() {
+// Test to see if API was connected
+  // @override
+  // void initState() {
+  //   super.initState();
+  //   _testApiConnection();
+  // }
+
+  // Future<void> _testApiConnection() async {
+  //   try {
+  //     final books = await _booksService.searchBooks('Harry Potter', maxResults: 3);
+  //     setState(() {
+  //       _apiTested = true;
+  //       _apiTestResult = "API Test: Found ${books.length} books. First book: ${books.isNotEmpty ? books[0].title : 'None'}";
+  //       print(_apiTestResult); // Also print to console for debugging
+  //     });
+  //   } catch (e) {
+  //     setState(() {
+  //       _apiTested = true;
+  //       _apiTestResult = "API Test Failed: $e";
+  //       print(_apiTestResult); // Also print to console for debugging
+  //     });
+  //   }
+  // }
+
+  void searchBooks()async {
     String query = searchController.text.toLowerCase();
 
     setState(() {
-      filteredBooks = books.where((book) {
-        if (!searchByTitle && !searchByAuthor && !searchByISBN) {
-          // If no filters selected, search all fields
-          return book.values.any((value) => value.toLowerCase().contains(query));
-        }
-        // Apply selected filters
-        return (searchByTitle && book["title"]!.toLowerCase().contains(query)) ||
-               (searchByAuthor && book["author"]!.toLowerCase().contains(query)) ||
-               (searchByISBN && book["isbn"]!.toLowerCase().contains(query));
-      }).toList();
+      books = [];
     });
+
+    try {
+      final results = await _booksService.searchWithFilters(
+        query,
+        searchTitle: searchByTitle,
+        searchAuthor: searchByAuthor,
+        searchISBN: searchByISBN,
+      );
+      setState(() {
+        books = results;
+      });
+    } catch (e) {
+      print("Error searching books: $e");
+    }
   }
 
   @override
@@ -122,12 +147,12 @@ class BookSearchScreenState extends State<BookSearchScreen> {
             SizedBox(height: 10),
             Expanded(
               child: ListView.builder(
-                itemCount: filteredBooks.length,
+                itemCount: books.length,
                 itemBuilder: (context, index) {
-                  var book = filteredBooks[index];
+                  var book = books[index];
                   return ListTile(
-                    title: Text(book["title"]!),
-                    subtitle: Text("Author: ${book["author"]} | ISBN: ${book["isbn"]}"),
+                    title: Text(book.title),
+                    subtitle: Text("Author: ${book.authors} | ISBN: ${book.isbn}"),
                   );
                 },
               ),
