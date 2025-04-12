@@ -22,16 +22,21 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
         'status': 'accepted',
       });
 
-      // Add both users to each other's friend lists
+      // Add both users to each other's friend lists using UIDs
       await firestore.collection('Users').doc(user.uid).update({
         'friends': FieldValue.arrayUnion([fromUser]),
       });
       await firestore.collection('Users').doc(fromUser).update({
-        'friends': FieldValue.arrayUnion([user.email]),
+        'friends': FieldValue.arrayUnion([user.uid]),
       });
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Friend request accepted!')),
+        SnackBar(
+          content: Text(
+            'Friend request accepted!',
+            style: TextStyle(color: AppColors().lightBrown, fontSize: 24),
+          ),
+        ),
       );
     } catch (e) {
       print('Error accepting request: $e');
@@ -45,7 +50,12 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
       await firestore.collection('friend_requests').doc(requestId).delete();
 
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Friend request rejected.')),
+        SnackBar(
+          content: Text(
+            'Friend request rejected.',
+            style: TextStyle(color: AppColors().lightBrown, fontSize: 24),
+          ),
+        ),
       );
     } catch (e) {
       print('Error rejecting request: $e');
@@ -63,7 +73,7 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
       body: StreamBuilder<QuerySnapshot>(
         stream: firestore
             .collection('friend_requests')
-            .where('toUser', isEqualTo: user.email)
+            .where('toUser', isEqualTo: user.uid)
             .where('status', isEqualTo: 'pending')
             .snapshots(),
         builder: (context, snapshot) {
@@ -84,25 +94,41 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
               var requestId = request.id;
               var fromUser = request['fromUser'];
 
-              return Card(
-                child: ListTile(
-                  leading: CircleAvatar(child: Icon(Icons.person)),
-                  title: Text(fromUser),
-                  subtitle: Text("Wants to be your friend!"),
-                  trailing: Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      IconButton(
-                        icon: Icon(Icons.check, color: Colors.green),
-                        onPressed: () => acceptRequest(requestId, fromUser),
+              return StreamBuilder<DocumentSnapshot>(
+                stream: firestore.collection('Users').doc(fromUser).snapshots(),
+                builder: (context, userSnapshot) {
+                  if (!userSnapshot.hasData) {
+                    return ListTile(
+                      leading: CircleAvatar(child: Icon(Icons.person)),
+                      title: Text("Loading..."),
+                    );
+                  }
+
+                  var userData =
+                      userSnapshot.data!.data() as Map<String, dynamic>;
+                  String fromUserEmail = userData['email'] ?? "Unknown User";
+
+                  return Card(
+                    child: ListTile(
+                      leading: CircleAvatar(child: Icon(Icons.person)),
+                      title: Text(fromUserEmail),
+                      subtitle: Text("Wants to be your friend!"),
+                      trailing: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          IconButton(
+                            icon: Icon(Icons.check, color: Colors.green),
+                            onPressed: () => acceptRequest(requestId, fromUser),
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.close, color: Colors.red),
+                            onPressed: () => rejectRequest(requestId),
+                          ),
+                        ],
                       ),
-                      IconButton(
-                        icon: Icon(Icons.close, color: Colors.red),
-                        onPressed: () => rejectRequest(requestId),
-                      ),
-                    ],
-                  ),
-                ),
+                    ),
+                  );
+                },
               );
             },
           );

@@ -4,6 +4,8 @@ class ReviewPage extends StatelessWidget {
   final _formKey = GlobalKey<FormState>();
   int _rating = 0;
 
+  ReviewPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

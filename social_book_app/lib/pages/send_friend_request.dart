@@ -18,13 +18,13 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
   String searchQuery = "";
 
   // Send friend request
-  Future<void> sendFriendRequest(String recipientEmail) async {
+  Future<void> sendFriendRequest(String recipientUid) async {
     try {
       var currentUser = auth.currentUser!;
       var existingRequest = await firestore
           .collection('friend_requests')
-          .where('fromUser', isEqualTo: currentUser.email)
-          .where('toUser', isEqualTo: recipientEmail)
+          .where('fromUser', isEqualTo: currentUser.uid)
+          .where('toUser', isEqualTo: recipientUid)
           .where('status', isEqualTo: 'pending')
           .get();
 
@@ -39,8 +39,8 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
       }
 
       await firestore.collection('friend_requests').add({
-        'fromUser': currentUser.email,
-        'toUser': recipientEmail,
+        'fromUser': currentUser.uid,
+        'toUser': recipientUid,
         'status': 'pending',
       });
 
@@ -102,7 +102,7 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
                 }
 
                 var users = snapshot.data!.docs.where(
-                  (doc) => doc['email'] != auth.currentUser!.email,
+                  (doc) => doc.id != auth.currentUser!.uid,
                 );
 
                 if (users.isEmpty) {
@@ -114,12 +114,13 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
                   itemBuilder: (context, index) {
                     var user = users.elementAt(index);
                     String email = user['email'];
+                    String uid = user.id;
 
                     return ListTile(
                       leading: CircleAvatar(child: Icon(Icons.person)),
                       title: Text(email),
                       trailing: ElevatedButton(
-                        onPressed: () => sendFriendRequest(email),
+                        onPressed: () => sendFriendRequest(uid),
                         child: Text("Add Friend"),
                       ),
                     );
