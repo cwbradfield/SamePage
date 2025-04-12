@@ -24,9 +24,9 @@ class FriendListScreen extends StatelessWidget {
         'friends': FieldValue.arrayRemove([currentUserUid])
       });
 
-      print("Friend removed successfully!");
+      debugPrint("Friend removed successfully!");
     } catch (e) {
-      print("Error removing friend: $e");
+      debugPrint("Error removing friend: $e");
     }
   }
 
@@ -76,7 +76,12 @@ class FriendListScreen extends StatelessWidget {
                   String friendUid = friends[index].id;
 
                   return ListTile(
-                    leading: CircleAvatar(child: Icon(Icons.person)),
+                    leading: CircleAvatar(
+                        backgroundColor: AppColors().darkBrown,
+                        child: Icon(
+                          Icons.person,
+                          color: AppColors().lightBrown,
+                        )),
                     title: Text(friendEmail),
                     onTap: () {
                       Navigator.push(
@@ -91,7 +96,10 @@ class FriendListScreen extends StatelessWidget {
                       onPressed: () {
                         removeFriend(friendUid);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(content: Text("Friend removed")),
+                          SnackBar(
+                            content: Text("Friend removed"),
+                            backgroundColor: AppColors().darkBrown,
+                          ),
                         );
                       },
                     ),

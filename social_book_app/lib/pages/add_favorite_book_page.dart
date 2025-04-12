@@ -42,7 +42,7 @@ class _AddFavoriteBookPageState extends State<AddFavoriteBookPage> {
         ),
       );
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
     }
   }
 

@@ -39,7 +39,7 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
         ),
       );
     } catch (e) {
-      print('Error accepting request: $e');
+      debugPrint('Error accepting request: $e');
     }
   }
 
@@ -58,7 +58,7 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
         ),
       );
     } catch (e) {
-      print('Error rejecting request: $e');
+      debugPrint('Error rejecting request: $e');
     }
   }
 

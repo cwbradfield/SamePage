@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/models/book_model.dart';
+import 'package:social_book_app/pages/display_book_page.dart';
 import 'package:social_book_app/services/google_books_service.dart';
 
 class BookSearchScreen extends StatefulWidget {
@@ -23,35 +24,9 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   bool searchByISBN = false;
 
   final GoogleBooksService _booksService = GoogleBooksService();
-  // bool _apiTested = false; // Just had this in there for testing purposes
-  // String _apiTestResult = "";
 
   List<Book> books = [];
   List<Book> filteredBooks = [];
-
-// Test to see if API was connected
-  // @override
-  // void initState() {
-  //   super.initState();
-  //   _testApiConnection();
-  // }
-
-  // Future<void> _testApiConnection() async {
-  //   try {
-  //     final books = await _booksService.searchBooks('Harry Potter', maxResults: 3);
-  //     setState(() {
-  //       _apiTested = true;
-  //       _apiTestResult = "API Test: Found ${books.length} books. First book: ${books.isNotEmpty ? books[0].title : 'None'}";
-  //       print(_apiTestResult); // Also print to console for debugging
-  //     });
-  //   } catch (e) {
-  //     setState(() {
-  //       _apiTested = true;
-  //       _apiTestResult = "API Test Failed: $e";
-  //       print(_apiTestResult); // Also print to console for debugging
-  //     });
-  //   }
-  // }
 
   void searchBooks() async {
     String query = searchController.text.toLowerCase();
@@ -71,14 +46,14 @@ class BookSearchScreenState extends State<BookSearchScreen> {
         books = results;
       });
     } catch (e) {
-      print("Error searching books: $e");
+      debugPrint("Error searching books: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 186, 146, 109), //Colors.grey[200],
+      backgroundColor: Color.fromARGB(255, 186, 146, 109),
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 186, 146, 109),
         actions: [
@@ -91,7 +66,6 @@ class BookSearchScreenState extends State<BookSearchScreen> {
           )
         ],
       ),
-      //appBar: AppBar(title: Text("Book Search")),
       body: Padding(
         padding: EdgeInsets.all(16),
         child: Column(
@@ -149,10 +123,38 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                 itemCount: books.length,
                 itemBuilder: (context, index) {
                   var book = books[index];
-                  return ListTile(
-                    title: Text(book.title),
-                    subtitle:
-                        Text("Author: ${book.authors} | ISBN: ${book.isbn}"),
+                  return Card(
+                    child: ListTile(
+                      leading: book.thumbnail.isNotEmpty
+                          ? Image.network(
+                              book.thumbnail,
+                              width: 50,
+                              height: 70,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Icon(Icons.book, size: 50);
+                              },
+                            )
+                          : Icon(Icons.book, size: 50),
+                      title: Text(book.title),
+                      subtitle: Text(
+                        "Author: ${book.authors.join(', ')}\nISBN: ${book.isbn}",
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DisplayBookPage(
+                              title: book.title,
+                              author: book.authors.join(', '),
+                              isbn: book.isbn,
+                              thumbnail: book.thumbnail,
+                              description: book.description,
+                            ),
+                          ),
+                        );
+                      },
+                    ),
                   );
                 },
               ),

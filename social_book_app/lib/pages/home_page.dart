@@ -1,7 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
-import 'package:social_book_app/pages/add_favorite_book_page.dart';
 import 'package:social_book_app/pages/display_book_page.dart';
 import 'package:social_book_app/pages/friend_list.dart';
 import 'package:social_book_app/pages/friend_request.dart';
@@ -48,12 +47,7 @@ class _HomePageState extends State<HomePage> {
               padding: EdgeInsets.all(16),
               child: Row(
                 children: [
-                  // CircleAvatar(
-                  //   radius: 40,
-                  //   backgroundImage: NetworkImage(
-                  //       "https://via.placeholder.com/150"), // Placeholder profile pic
-                  // ),
-                  Icon(Icons.person),
+                  Icon(Icons.person, size: 50, color: AppColors().darkBrown),
                   SizedBox(width: 16),
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -65,7 +59,8 @@ class _HomePageState extends State<HomePage> {
                       ),
                       Text(
                         "📖 Avid Reader | Book Lover",
-                        style: TextStyle(fontSize: 16, color: Colors.grey[700]),
+                        style: TextStyle(
+                            fontSize: 16, color: AppColors().darkBrown),
                       ),
                     ],
                   ),
@@ -82,8 +77,8 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
             SizedBox(
-              height: 120,
-              child: StreamBuilder<List<String>>(
+              height: 180,
+              child: StreamBuilder<List<Map<String, dynamic>>>(
                 stream: Database().getFavoriteBooks(),
                 builder: (context, snapshot) {
                   if (snapshot.connectionState == ConnectionState.waiting) {
@@ -96,77 +91,54 @@ class _HomePageState extends State<HomePage> {
                     return Center(child: Text("Error loading books"));
                   }
 
-                  List<String> bookTitles = snapshot.data ?? [];
+                  List<Map<String, dynamic>> books = snapshot.data ?? [];
+
+                  if (books.isEmpty) {
+                    return Center(
+                      child: Text(
+                        "No favorite books yet",
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.grey[700],
+                        ),
+                      ),
+                    );
+                  }
 
                   return ListView.builder(
                     scrollDirection: Axis.horizontal,
-                    itemCount: bookTitles.length,
+                    itemCount: books.length,
                     itemBuilder: (context, index) {
+                      var book = books[index];
                       return GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => DisplayBookPage(
-                                        title: bookTitles[index])));
-                          },
-                          child: _buildFavoriteBookCard(bookTitles[index]));
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => DisplayBookPage(
+                                title: book['title'] ?? '',
+                                author: book['author'] ?? '',
+                                isbn: book['isbn'] ?? '',
+                                thumbnail: book['thumbnail'] ?? '',
+                                description: book['description'] ?? '',
+                              ),
+                            ),
+                          );
+                        },
+                        child: _buildFavoriteBookCard(
+                          book['title'] ?? '',
+                          book['thumbnail'] ?? '',
+                        ),
+                      );
                     },
                   );
                 },
               ),
             ),
 
-            Padding(
-              padding: const EdgeInsets.all(24.0),
-              child: Center(
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => AddFavoriteBookPage()));
-                  },
-                  child: Text(
-                    "Add a book",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-
             SizedBox(
-              height: 10,
+              height: 30,
             ),
-
-            //    MAYBE IMPLEMENT LATER????
-            //
-            //
-            //
-
-            // Recent Reviews Section
-            // Padding(
-            //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //   child: Text(
-            //     "📝 Recent Reviews",
-            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-            // _buildReviewItem("The Hobbit", "Loved the adventure! 🌟🌟🌟🌟🌟"),
-            // _buildReviewItem("Dune", "A masterpiece of sci-fi. 🌟🌟🌟🌟"),
-
-            // // Friends List
-            // Padding(
-            //   padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            //   child: Text(
-            //     "👥 Friends",
-            //     style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            //   ),
-            // ),
-            // _buildFriendItem("Alice Johnson", "alice@example.com"),
-            // _buildFriendItem("Bob Smith", "bob@example.com"),
 
             Padding(
               padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
@@ -183,9 +155,9 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.search),
                   label: Text("Search for Books"),
                   style: ElevatedButton.styleFrom(
-                    iconColor: AppColors().darkBrown,
-                    backgroundColor: Colors.brown,
-                    foregroundColor: Colors.black,
+                    iconColor: AppColors().lightBrown,
+                    backgroundColor: Colors.black87,
+                    foregroundColor: AppColors().lightBrown,
                     padding: EdgeInsets.symmetric(vertical: 12),
                     textStyle: TextStyle(fontSize: 18),
                   ),
@@ -261,58 +233,44 @@ class _HomePageState extends State<HomePage> {
   }
 
   // Favorite Book Card Widget
-  Widget _buildFavoriteBookCard(String title) {
+  Widget _buildFavoriteBookCard(String title, String thumbnail) {
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 8),
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-        child: Padding(
-          padding: EdgeInsets.all(16),
+        child: Container(
+          width: 120,
+          height: 180,
+          padding: EdgeInsets.all(8),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(Icons.book, size: 40, color: Colors.brown),
+              Container(
+                height: 100,
+                width: 80,
+                child: thumbnail.isNotEmpty
+                    ? Image.network(
+                        thumbnail,
+                        fit: BoxFit.contain,
+                        errorBuilder: (context, error, stackTrace) {
+                          return Icon(Icons.book,
+                              size: 40, color: Colors.brown);
+                        },
+                      )
+                    : Icon(Icons.book, size: 40, color: Colors.brown),
+              ),
               SizedBox(height: 8),
-              Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
+              Container(
+                height: 40,
+                child: Text(
+                  title.isNotEmpty ? title : "No title",
+                  style: TextStyle(fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  // Review Item Widget
-  Widget _buildReviewItem(String bookTitle, String reviewText) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Card(
-        child: ListTile(
-          leading: Icon(Icons.star, color: Colors.amber),
-          title: Text(bookTitle, style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(reviewText),
-        ),
-      ),
-    );
-  }
-
-  // Friend Item Widget
-  Widget _buildFriendItem(String name, String email) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Card(
-        child: ListTile(
-          // leading: CircleAvatar(
-          //   backgroundImage: NetworkImage("https://via.placeholder.com/100"),
-          // ),
-
-          leading: Icon(Icons.person),
-          title: Text(name, style: TextStyle(fontWeight: FontWeight.bold)),
-          subtitle: Text(email),
-          trailing: IconButton(
-            icon: Icon(Icons.person_add, color: Colors.blue),
-            onPressed: () {
-              // TODO: Implement add friend functionality
-            },
           ),
         ),
       ),

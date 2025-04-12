@@ -52,7 +52,7 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
         )),
       );
     } catch (e) {
-      print('Error sending request: $e');
+      debugPrint('Error sending request: $e');
     }
   }
 
