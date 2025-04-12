@@ -5,6 +5,7 @@ import 'package:social_book_app/models/app_colors.dart';
 import 'friend_profile.dart';
 
 class FriendListScreen extends StatelessWidget {
+  FriendListScreen({super.key});
   final FirebaseAuth auth = FirebaseAuth.instance;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
@@ -40,9 +41,10 @@ class FriendListScreen extends StatelessWidget {
       body: StreamBuilder<DocumentSnapshot>(
         stream: firestore
             .collection('Users')
-            .doc(auth.currentUser!.email)
+            .doc(auth.currentUser!.uid)
             .snapshots(),
         builder: (context, snapshot) {
+          print("Snapshot: ${snapshot}");
           if (!snapshot.hasData || !snapshot.data!.exists) {
             return Center(child: Text("No user data found."));
           }
@@ -63,6 +65,7 @@ class FriendListScreen extends StatelessWidget {
                 leading: CircleAvatar(child: Icon(Icons.person)),
                 title: Text(friendEmail),
                 onTap: () {
+                  print("THIS IS FRIENDS EMAIL: $friendEmail");
                   // Navigate to Friend Profile Screen
                   Navigator.push(
                     context,

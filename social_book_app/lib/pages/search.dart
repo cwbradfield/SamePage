@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/models/book_model.dart';
 import 'package:social_book_app/services/google_books_service.dart';
 
-
 class BookSearchScreen extends StatefulWidget {
   BookSearchScreen({super.key});
 
@@ -54,7 +53,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   //   }
   // }
 
-  void searchBooks()async {
+  void searchBooks() async {
     String query = searchController.text.toLowerCase();
 
     setState(() {
@@ -79,7 +78,7 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 186, 146, 109),//Colors.grey[200],
+      backgroundColor: Color.fromARGB(255, 186, 146, 109), //Colors.grey[200],
       appBar: AppBar(
         backgroundColor: Color.fromARGB(255, 186, 146, 109),
         actions: [
@@ -152,7 +151,8 @@ class BookSearchScreenState extends State<BookSearchScreen> {
                   var book = books[index];
                   return ListTile(
                     title: Text(book.title),
-                    subtitle: Text("Author: ${book.authors} | ISBN: ${book.isbn}"),
+                    subtitle:
+                        Text("Author: ${book.authors} | ISBN: ${book.isbn}"),
                   );
                 },
               ),

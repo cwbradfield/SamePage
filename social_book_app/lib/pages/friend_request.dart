@@ -7,10 +7,10 @@ class FriendRequestsScreen extends StatefulWidget {
   const FriendRequestsScreen({super.key});
 
   @override
-  _FriendRequestsScreenState createState() => _FriendRequestsScreenState();
+  FriendRequestsScreenState createState() => FriendRequestsScreenState();
 }
 
-class _FriendRequestsScreenState extends State<FriendRequestsScreen> {
+class FriendRequestsScreenState extends State<FriendRequestsScreen> {
   final user = FirebaseAuth.instance.currentUser!;
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
