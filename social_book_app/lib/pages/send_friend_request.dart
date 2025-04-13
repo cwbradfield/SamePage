@@ -7,11 +7,10 @@ class SendFriendRequestScreen extends StatefulWidget {
   const SendFriendRequestScreen({super.key});
 
   @override
-  _SendFriendRequestScreenState createState() =>
-      _SendFriendRequestScreenState();
+  SendFriendRequestScreenState createState() => SendFriendRequestScreenState();
 }
 
-class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
+class SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
   final TextEditingController _searchController = TextEditingController();
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
   final FirebaseAuth auth = FirebaseAuth.instance;
@@ -72,8 +71,18 @@ class _SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
               controller: _searchController,
               decoration: InputDecoration(
                 labelText: "Search by email",
+                labelStyle: TextStyle(color: AppColors().darkBrown),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors().darkBrown),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors().darkBrown),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: AppColors().darkBrown),
+                ),
                 suffixIcon: IconButton(
-                  icon: Icon(Icons.search),
+                  icon: Icon(Icons.search, color: AppColors().darkBrown),
                   onPressed: () {
                     setState(() {
                       searchQuery = _searchController.text.trim();

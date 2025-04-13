@@ -1,5 +1,6 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/models/book_model.dart';
 import 'package:social_book_app/pages/display_book_page.dart';
 import 'package:social_book_app/services/google_books_service.dart';
@@ -8,10 +9,6 @@ class BookSearchScreen extends StatefulWidget {
   BookSearchScreen({super.key});
 
   final user = FirebaseAuth.instance.currentUser!;
-
-  void signUserOut() {
-    FirebaseAuth.instance.signOut();
-  }
 
   @override
   BookSearchScreenState createState() => BookSearchScreenState();
@@ -53,18 +50,10 @@ class BookSearchScreenState extends State<BookSearchScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Color.fromARGB(255, 186, 146, 109),
+      backgroundColor: AppColors().lightBrown,
       appBar: AppBar(
-        backgroundColor: Color.fromARGB(255, 186, 146, 109),
-        actions: [
-          IconButton(
-            onPressed: BookSearchScreen().signUserOut,
-            icon: Icon(
-              Icons.logout,
-              color: Color.fromARGB(255, 66, 37, 10),
-            ),
-          )
-        ],
+        backgroundColor: AppColors().lightBrown,
+        title: Text("Search Books"),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),
@@ -74,9 +63,19 @@ class BookSearchScreenState extends State<BookSearchScreen> {
               controller: searchController,
               decoration: InputDecoration(
                 labelText: "Search Books",
-                border: OutlineInputBorder(),
+                labelStyle: TextStyle(color: AppColors().darkBrown),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(color: Colors.black87),
+                ),
                 suffixIcon: IconButton(
                   icon: Icon(Icons.search),
+                  color: AppColors().darkBrown,
                   onPressed: searchBooks,
                 ),
               ),
@@ -84,35 +83,54 @@ class BookSearchScreenState extends State<BookSearchScreen> {
             ),
             SizedBox(height: 10),
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Expanded(
                   child: CheckboxListTile(
-                    title: Text("Title"),
+                    contentPadding: EdgeInsets.only(left: 0, right: 40),
+                    title: Text(
+                      "Title",
+                      style: TextStyle(fontSize: 14),
+                    ),
                     value: searchByTitle,
                     onChanged: (value) {
                       setState(() => searchByTitle = value!);
                       searchBooks();
                     },
+                    checkColor: AppColors().lightBrown,
+                    activeColor: AppColors().darkBrown,
                   ),
                 ),
                 Expanded(
                   child: CheckboxListTile(
-                    title: Text("Author"),
+                    contentPadding: EdgeInsets.only(left: 10, right: 20),
+                    title: Text(
+                      "Author",
+                      style: TextStyle(fontSize: 14),
+                    ),
                     value: searchByAuthor,
                     onChanged: (value) {
                       setState(() => searchByAuthor = value!);
                       searchBooks();
                     },
+                    checkColor: AppColors().lightBrown,
+                    activeColor: AppColors().darkBrown,
                   ),
                 ),
                 Expanded(
                   child: CheckboxListTile(
-                    title: Text("ISBN"),
+                    contentPadding: EdgeInsets.only(left: 30, right: 0),
+                    title: Text(
+                      "ISBN",
+                      style: TextStyle(fontSize: 14),
+                    ),
                     value: searchByISBN,
                     onChanged: (value) {
                       setState(() => searchByISBN = value!);
                       searchBooks();
                     },
+                    checkColor: AppColors().lightBrown,
+                    activeColor: AppColors().darkBrown,
                   ),
                 ),
               ],

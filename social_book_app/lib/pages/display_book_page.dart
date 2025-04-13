@@ -27,11 +27,36 @@ class DisplayBookPage extends StatefulWidget {
 class _DisplayBookPageState extends State<DisplayBookPage> {
   final reviewController = TextEditingController();
   bool isFavorite = false;
+  bool _isLoading = false;
+  Stream<List<Map<String, dynamic>>>? _reviewsStream;
 
   @override
   void initState() {
     super.initState();
     _checkIfFavorite();
+    _initializeReviewsStream();
+  }
+
+  void _initializeReviewsStream() {
+    if (mounted) {
+      setState(() {
+        _reviewsStream = Database().getBookReviews(widget.title);
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(DisplayBookPage oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.title != widget.title) {
+      _initializeReviewsStream();
+    }
+  }
+
+  @override
+  void dispose() {
+    reviewController.dispose();
+    super.dispose();
   }
 
   Future<void> _checkIfFavorite() async {
@@ -94,28 +119,82 @@ class _DisplayBookPageState extends State<DisplayBookPage> {
     }
   }
 
-  void addReview(String reviewText) async {
+  Future<void> _deleteReview(String reviewId) async {
     try {
-      await FirebaseFirestore.instance.collection("Reviews").add({
-        'title': widget.title,
-        'review': reviewText,
-        'user': FirebaseAuth.instance.currentUser!.email
-      });
-
-      reviewController.clear();
-
+      await Database().deleteReview(reviewId);
+      _initializeReviewsStream();
+    } catch (e) {
+      debugPrint('Error deleting review: $e');
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            "Review added successfully!",
+            "Error deleting review. Please try again.",
             style: TextStyle(fontSize: 20, color: Colors.white),
           ),
-          backgroundColor: AppColors().darkBrown,
+          backgroundColor: Colors.red,
           duration: Duration(seconds: 2),
         ),
       );
+    }
+  }
+
+  Widget _buildReviewItem(Map<String, dynamic> review) {
+    bool isCurrentUser =
+        review['userId'] == FirebaseAuth.instance.currentUser!.uid;
+
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Card(
+        child: ListTile(
+          leading: Icon(Icons.person, color: AppColors().darkBrown),
+          title: Text(
+            review['user'] ?? 'Anonymous',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+              color: AppColors().darkBrown,
+            ),
+          ),
+          subtitle: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(review['review'] ?? ''),
+              SizedBox(height: 4),
+              Text(
+                _formatTimestamp(review['timestamp'] as Timestamp),
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                ),
+              ),
+            ],
+          ),
+          trailing: isCurrentUser
+              ? IconButton(
+                  icon: Icon(Icons.delete, color: Colors.red),
+                  onPressed: () => _deleteReview(review['id']),
+                )
+              : null,
+        ),
+      ),
+    );
+  }
+
+  String _formatTimestamp(Timestamp timestamp) {
+    DateTime date = timestamp.toDate();
+    return '${date.month}/${date.day}/${date.year}';
+  }
+
+  Future<bool> _checkForReviews() async {
+    try {
+      var snapshot = await FirebaseFirestore.instance
+          .collection('Reviews')
+          .where('bookTitle', isEqualTo: widget.title)
+          .limit(1)
+          .get();
+      return snapshot.docs.isNotEmpty;
     } catch (e) {
-      debugPrint(e.toString());
+      debugPrint('Error checking for reviews: $e');
+      return false;
     }
   }
 
@@ -140,13 +219,16 @@ class _DisplayBookPageState extends State<DisplayBookPage> {
           child: Column(
             children: [
               if (widget.thumbnail.isNotEmpty)
-                Image.network(
-                  widget.thumbnail,
-                  height: 300,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Icon(Icons.book, size: 200);
-                  },
+                SizedBox(
+                  height: 400,
+                  width: double.infinity,
+                  child: Image.network(
+                    widget.thumbnail,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) {
+                      return Icon(Icons.book, size: 200);
+                    },
+                  ),
                 ),
               Padding(
                 padding: EdgeInsets.all(16),
@@ -165,7 +247,7 @@ class _DisplayBookPageState extends State<DisplayBookPage> {
                       "By ${widget.author}",
                       style: TextStyle(
                         fontSize: 18,
-                        color: Colors.grey[700],
+                        color: AppColors().darkBrown,
                       ),
                     ),
                     SizedBox(height: 16),
@@ -186,7 +268,7 @@ class _DisplayBookPageState extends State<DisplayBookPage> {
                   ],
                 ),
               ),
-              Divider(),
+              Divider(color: AppColors().darkBrown),
               Padding(
                 padding: EdgeInsets.all(16),
                 child: Column(
@@ -202,30 +284,74 @@ class _DisplayBookPageState extends State<DisplayBookPage> {
                     SizedBox(height: 10),
                     SizedBox(
                       height: 550,
-                      child: StreamBuilder<List<String>>(
-                        stream: Database().getAllReviews(widget.title),
+                      child: FutureBuilder<bool>(
+                        future: _checkForReviews(),
                         builder: (context, snapshot) {
                           if (snapshot.connectionState ==
                               ConnectionState.waiting) {
                             return Center(
-                                child: CircularProgressIndicator(
-                              color: AppColors().darkBrown,
-                            ));
+                              child: CircularProgressIndicator(
+                                color: AppColors().darkBrown,
+                              ),
+                            );
                           }
 
-                          if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                            return Text("No reviews yet");
+                          if (!snapshot.hasData || !snapshot.data!) {
+                            return Center(
+                              child: Text(
+                                "No reviews yet",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: AppColors().darkBrown,
+                                ),
+                              ),
+                            );
                           }
 
-                          if (snapshot.hasError) {
-                            return Center(child: Text("Error loading reviews"));
-                          }
+                          return StreamBuilder<List<Map<String, dynamic>>>(
+                            stream: _reviewsStream,
+                            builder: (context, snapshot) {
+                              if (snapshot.hasError) {
+                                return Center(
+                                  child: Text(
+                                    "Error loading reviews",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.red,
+                                    ),
+                                  ),
+                                );
+                              }
 
-                          return ListView.builder(
-                            scrollDirection: Axis.vertical,
-                            itemCount: snapshot.data!.length,
-                            itemBuilder: (context, index) {
-                              return _buildReviewItem(snapshot.data![index]);
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    color: AppColors().darkBrown,
+                                  ),
+                                );
+                              }
+
+                              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                                return Center(
+                                  child: Text(
+                                    "No reviews yet",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.grey[700],
+                                    ),
+                                  ),
+                                );
+                              }
+
+                              return ListView.builder(
+                                scrollDirection: Axis.vertical,
+                                itemCount: snapshot.data!.length,
+                                itemBuilder: (context, index) {
+                                  return _buildReviewItem(
+                                      snapshot.data![index]);
+                                },
+                              );
                             },
                           );
                         },
@@ -239,45 +365,84 @@ class _DisplayBookPageState extends State<DisplayBookPage> {
                 child: TextField(
                   controller: reviewController,
                   decoration: InputDecoration(
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.black87),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                          borderSide: BorderSide(color: Colors.black87)),
-                      fillColor: Colors.grey[200],
-                      filled: true,
-                      hintText: 'Leave a review',
-                      hintStyle: TextStyle(color: Colors.grey[600])),
+                    enabledBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black87),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderSide: BorderSide(color: Colors.black87),
+                    ),
+                    fillColor: Colors.grey[200],
+                    filled: true,
+                    hintText: 'Leave a review',
+                    hintStyle: TextStyle(color: Colors.grey[600]),
+                  ),
                   maxLines: null,
                   keyboardType: TextInputType.multiline,
                 ),
               ),
-              ElevatedButton(
-                style: ButtonStyle(
+              Padding(
+                padding: EdgeInsets.all(16),
+                child: ElevatedButton(
+                  style: ButtonStyle(
                     backgroundColor:
-                        WidgetStatePropertyAll<Color>(Colors.black87)),
-                onPressed: () {
-                  addReview(reviewController.text);
-                },
-                child: Text(
-                  "Add review",
-                  style: TextStyle(color: Colors.white),
+                        WidgetStatePropertyAll<Color>(Colors.black87),
+                  ),
+                  onPressed: _isLoading
+                      ? null
+                      : () {
+                          if (reviewController.text.trim().isNotEmpty) {
+                            setState(() {
+                              _isLoading = true;
+                            });
+                            Database()
+                                .addReview(
+                                    widget.title, reviewController.text.trim())
+                                .then((_) {
+                              if (mounted) {
+                                setState(() {
+                                  _isLoading = false;
+                                  reviewController.clear();
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Review added successfully!",
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white),
+                                    ),
+                                    backgroundColor: AppColors().darkBrown,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            }).catchError((error) {
+                              if (mounted) {
+                                setState(() {
+                                  _isLoading = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: Text(
+                                      "Error adding review. Please try again.",
+                                      style: TextStyle(
+                                          fontSize: 20, color: Colors.white),
+                                    ),
+                                    backgroundColor: Colors.red,
+                                    duration: Duration(seconds: 2),
+                                  ),
+                                );
+                              }
+                            });
+                          }
+                        },
+                  child: Text(
+                    _isLoading ? "Adding review..." : "Add review",
+                    style: TextStyle(color: Colors.white),
+                  ),
                 ),
               ),
             ],
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildReviewItem(String reviewText) {
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Card(
-        child: ListTile(
-          leading: Icon(Icons.star, color: Colors.amber),
-          title: Text(reviewText),
         ),
       ),
     );

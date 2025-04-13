@@ -67,6 +67,73 @@ class _HomePageState extends State<HomePage> {
                 ],
               ),
             ),
+            Container(
+              decoration: BoxDecoration(
+                border: Border.symmetric(
+                  horizontal: BorderSide(
+                    color: AppColors().darkBrown,
+                  ),
+                ),
+              ),
+              height: 50,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: [
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FriendListScreen()));
+                      },
+                      child: Text("Friends",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors().darkBrown)),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => FriendRequestsScreen()));
+                      },
+                      child: Text("Requests",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors().darkBrown)),
+                    ),
+                    SizedBox(
+                      width: 10,
+                    ),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    SendFriendRequestScreen()));
+                      },
+                      child: Text("Add Friends",
+                          style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: AppColors().darkBrown)),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 30,
+            ),
 
             // Favorite Books Section
             Padding(
@@ -99,7 +166,7 @@ class _HomePageState extends State<HomePage> {
                         "No favorite books yet",
                         style: TextStyle(
                           fontSize: 16,
-                          color: Colors.grey[700],
+                          color: AppColors().darkBrown,
                         ),
                       ),
                     );
@@ -164,68 +231,6 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
-            SizedBox(
-              height: 20,
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FriendListScreen()),
-                    );
-                  },
-                  child: Text("View Friends",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => FriendRequestsScreen()),
-                    );
-                  },
-                  child: Text(
-                    "View Friend Requests",
-                    style: TextStyle(color: Colors.white),
-                  ),
-                ),
-              ),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 4, horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ButtonStyle(
-                      backgroundColor: WidgetStatePropertyAll(Colors.black87)),
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => SendFriendRequestScreen()),
-                    );
-                  },
-                  child: Text("Add Friends",
-                      style: TextStyle(color: Colors.white)),
-                ),
-              ),
-            ),
           ],
         ),
       ),
@@ -245,7 +250,7 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Container(
+              SizedBox(
                 height: 100,
                 width: 80,
                 child: thumbnail.isNotEmpty
@@ -260,7 +265,7 @@ class _HomePageState extends State<HomePage> {
                     : Icon(Icons.book, size: 40, color: Colors.brown),
               ),
               SizedBox(height: 8),
-              Container(
+              SizedBox(
                 height: 40,
                 child: Text(
                   title.isNotEmpty ? title : "No title",
