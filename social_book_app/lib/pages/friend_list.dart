@@ -41,7 +41,7 @@ class FriendListScreen extends StatelessWidget {
           "My Friends",
           style: TextStyle(
               color: AppColors().darkBrown,
-              fontSize: 24,
+              fontSize: 28,
               fontWeight: FontWeight.bold),
         ),
         backgroundColor: AppColors().lightBrown,

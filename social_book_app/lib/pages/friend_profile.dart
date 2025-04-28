@@ -105,7 +105,7 @@ class FriendProfileScreen extends StatelessWidget {
                     Text(
                       email,
                       style: TextStyle(
-                        fontSize: 24,
+                        fontSize: 30,
                         fontWeight: FontWeight.bold,
                         color: Colors.black,
                       ),
@@ -118,7 +118,7 @@ class FriendProfileScreen extends StatelessWidget {
                 Text(
                   "📚 Favorite Books",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors().darkBrown,
                   ),
@@ -177,7 +177,7 @@ class FriendProfileScreen extends StatelessWidget {
                 Text(
                   "📖 Book Reviews",
                   style: TextStyle(
-                    fontSize: 20,
+                    fontSize: 24,
                     fontWeight: FontWeight.bold,
                     color: AppColors().darkBrown,
                   ),

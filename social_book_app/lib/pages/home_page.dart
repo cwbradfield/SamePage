@@ -52,8 +52,9 @@ class _HomePageState extends State<HomePage> {
           });
         },
         backgroundColor: AppColors().darkBrown,
-        selectedItemColor: AppColors().lightBrown,
-        unselectedItemColor: const Color.fromARGB(255, 241, 213, 200),
+        selectedItemColor: const Color.fromARGB(255, 242, 231, 226),
+        unselectedItemColor: AppColors().lightBrown,
+        selectedIconTheme: IconThemeData(size: 30.0),
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -104,7 +105,7 @@ class _HomePageState extends State<HomePage> {
                       user.email!,
                       style: TextStyle(
                           color: Colors.black,
-                          fontSize: 22,
+                          fontSize: 30,
                           fontWeight: FontWeight.bold),
                     ),
                     SizedBox(height: 4),
@@ -122,7 +123,7 @@ class _HomePageState extends State<HomePage> {
               "📚 Favorite Books",
               style: TextStyle(
                   color: AppColors().darkBrown,
-                  fontSize: 20,
+                  fontSize: 24,
                   fontWeight: FontWeight.bold),
             ),
           ),
@@ -194,7 +195,7 @@ class _HomePageState extends State<HomePage> {
             child: Text(
               "📖 My Reviews",
               style: TextStyle(
-                fontSize: 20,
+                fontSize: 24,
                 fontWeight: FontWeight.bold,
                 color: AppColors().darkBrown,
               ),
