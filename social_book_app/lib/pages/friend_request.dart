@@ -32,6 +32,7 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          backgroundColor: AppColors().darkBrown,
           content: Text(
             'Friend request accepted!',
             style: TextStyle(color: AppColors().lightBrown, fontSize: 24),
@@ -51,6 +52,7 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+          backgroundColor: AppColors().darkBrown,
           content: Text(
             'Friend request rejected.',
             style: TextStyle(color: AppColors().lightBrown, fontSize: 24),
@@ -78,7 +80,8 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
             .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(color: AppColors().darkBrown));
           }
 
           if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
@@ -110,7 +113,11 @@ class FriendRequestsScreenState extends State<FriendRequestsScreen> {
 
                   return Card(
                     child: ListTile(
-                      leading: CircleAvatar(child: Icon(Icons.person)),
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors().darkBrown,
+                        child:
+                            Icon(Icons.person, color: AppColors().lightBrown),
+                      ),
                       title: Text(fromUserEmail),
                       subtitle: Text("Wants to be your friend!"),
                       trailing: Row(

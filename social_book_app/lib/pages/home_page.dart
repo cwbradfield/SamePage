@@ -3,10 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:social_book_app/models/app_colors.dart';
 import 'package:social_book_app/pages/display_book_page.dart';
 import 'package:social_book_app/pages/friend_list.dart';
-import 'package:social_book_app/pages/friend_request.dart';
 import 'package:social_book_app/pages/search.dart';
 import 'package:social_book_app/database/database.dart';
-import 'package:social_book_app/pages/send_friend_request.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,6 +16,12 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final user = FirebaseAuth.instance.currentUser!;
+  int _currentIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+  }
 
   void signUserOut() {
     FirebaseAuth.instance.signOut();
@@ -38,201 +43,246 @@ class _HomePageState extends State<HomePage> {
           )
         ],
       ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Profile Header
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Row(
-                children: [
-                  Icon(Icons.person, size: 50, color: AppColors().darkBrown),
-                  SizedBox(width: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user.email!,
-                        style: TextStyle(
-                            fontSize: 22, fontWeight: FontWeight.bold),
-                      ),
-                      Text(
-                        "📖 Avid Reader | Book Lover",
-                        style: TextStyle(
-                            fontSize: 16, color: AppColors().darkBrown),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            Container(
-              decoration: BoxDecoration(
-                border: Border.symmetric(
-                  horizontal: BorderSide(
-                    color: AppColors().darkBrown,
-                  ),
-                ),
-              ),
-              height: 50,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+      body: _getCurrentPage(),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: _currentIndex,
+        onTap: (index) {
+          setState(() {
+            _currentIndex = index;
+          });
+        },
+        backgroundColor: AppColors().darkBrown,
+        selectedItemColor: AppColors().lightBrown,
+        unselectedItemColor: const Color.fromARGB(255, 241, 213, 200),
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.people),
+            label: 'Friends',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.search),
+            label: 'Search',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _getCurrentPage() {
+    switch (_currentIndex) {
+      case 0:
+        return _buildHomeContent();
+      case 1:
+        return FriendListScreen();
+      case 2:
+        return BookSearchScreen();
+      default:
+        return _buildHomeContent();
+    }
+  }
+
+  Widget _buildHomeContent() {
+    return SingleChildScrollView(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Profile Header
+          Padding(
+            padding: EdgeInsets.all(16),
+            child: Row(
+              children: [
+                Icon(Icons.person, size: 50, color: AppColors().darkBrown),
+                SizedBox(width: 16),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FriendListScreen()));
-                      },
-                      child: Text("Friends",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors().darkBrown)),
+                    Text(
+                      user.email!,
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold),
                     ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => FriendRequestsScreen()));
-                      },
-                      child: Text("Requests",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors().darkBrown)),
-                    ),
-                    SizedBox(
-                      width: 10,
-                    ),
-                    GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    SendFriendRequestScreen()));
-                      },
-                      child: Text("Add Friends",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: AppColors().darkBrown)),
-                    ),
+                    SizedBox(height: 4),
                   ],
                 ),
+              ],
+            ),
+          ),
+          SizedBox(height: 30),
+
+          // Favorite Books Section
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Text(
+              "📚 Favorite Books",
+              style: TextStyle(
+                  color: AppColors().darkBrown,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+            ),
+          ),
+          SizedBox(
+            height: 180,
+            child: StreamBuilder<List<Map<String, dynamic>>>(
+              stream: Database().getFavoriteBooks(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                    color: AppColors().darkBrown,
+                  ));
+                }
+                if (snapshot.hasError) {
+                  return Center(child: Text("Error loading books"));
+                }
+
+                List<Map<String, dynamic>> books = snapshot.data ?? [];
+
+                if (books.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No favorite books yet",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  );
+                }
+
+                return ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: books.length,
+                  itemBuilder: (context, index) {
+                    var book = books[index];
+                    return GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => DisplayBookPage(
+                              title: book['title'] ?? '',
+                              author: book['author'] ?? '',
+                              isbn: book['isbn'] ?? '',
+                              thumbnail: book['thumbnail'] ?? '',
+                              description: book['description'] ?? '',
+                            ),
+                          ),
+                        );
+                      },
+                      child: _buildFavoriteBookCard(
+                        book['title'] ?? '',
+                        book['thumbnail'] ?? '',
+                      ),
+                    );
+                  },
+                );
+              },
+            ),
+          ),
+
+          SizedBox(height: 30),
+
+          // Reviews Section
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: 16),
+            child: Text(
+              "📖 My Reviews",
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppColors().darkBrown,
               ),
             ),
-            SizedBox(
-              height: 30,
-            ),
+          ),
+          SizedBox(height: 10),
+          Container(
+            height: 300, // Fixed height for the reviews section
+            child: StreamBuilder<QuerySnapshot>(
+              stream: FirebaseFirestore.instance
+                  .collection('Reviews')
+                  .where('userId', isEqualTo: user.uid)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                      child: CircularProgressIndicator(
+                    color: AppColors().darkBrown,
+                  ));
+                }
 
-            // Favorite Books Section
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              child: Text(
-                "📚 Favorite Books",
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-            ),
-            SizedBox(
-              height: 180,
-              child: StreamBuilder<List<Map<String, dynamic>>>(
-                stream: Database().getFavoriteBooks(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                        child: CircularProgressIndicator(
-                      color: AppColors().darkBrown,
-                    ));
-                  }
-                  if (snapshot.hasError) {
-                    return Center(child: Text("Error loading books"));
-                  }
+                if (snapshot.hasError) {
+                  return Center(
+                    child: Text(
+                      "Error loading reviews",
+                      style: TextStyle(color: Colors.red),
+                    ),
+                  );
+                }
 
-                  List<Map<String, dynamic>> books = snapshot.data ?? [];
+                if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                  return Center(
+                    child: Text(
+                      "No reviews yet",
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.black,
+                      ),
+                    ),
+                  );
+                }
 
-                  if (books.isEmpty) {
-                    return Center(
-                      child: Text(
-                        "No favorite books yet",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: AppColors().darkBrown,
+                var reviews = snapshot.data!.docs;
+                return ListView.builder(
+                  itemCount: reviews.length,
+                  itemBuilder: (context, index) {
+                    var review = reviews[index];
+                    String bookTitle = review['bookTitle'] ?? 'Unknown Book';
+                    String reviewText = review['review'] ?? '';
+
+                    // Limit review text to 100 characters
+                    String previewText = reviewText.length > 100
+                        ? reviewText.substring(0, 100) + '...'
+                        : reviewText;
+
+                    return Card(
+                      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                      child: Padding(
+                        padding: EdgeInsets.all(12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              bookTitle,
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
+                                color: AppColors().darkBrown,
+                              ),
+                            ),
+                            SizedBox(height: 8),
+                            Text(
+                              previewText,
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.black87,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     );
-                  }
-
-                  return ListView.builder(
-                    scrollDirection: Axis.horizontal,
-                    itemCount: books.length,
-                    itemBuilder: (context, index) {
-                      var book = books[index];
-                      return GestureDetector(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => DisplayBookPage(
-                                title: book['title'] ?? '',
-                                author: book['author'] ?? '',
-                                isbn: book['isbn'] ?? '',
-                                thumbnail: book['thumbnail'] ?? '',
-                                description: book['description'] ?? '',
-                              ),
-                            ),
-                          );
-                        },
-                        child: _buildFavoriteBookCard(
-                          book['title'] ?? '',
-                          book['thumbnail'] ?? '',
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-
-            SizedBox(
-              height: 30,
-            ),
-
-            Padding(
-              padding: EdgeInsets.symmetric(vertical: 16, horizontal: 16),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton.icon(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: (context) => BookSearchScreen()),
-                    );
                   },
-                  icon: Icon(Icons.search),
-                  label: Text("Search for Books"),
-                  style: ElevatedButton.styleFrom(
-                    iconColor: AppColors().lightBrown,
-                    backgroundColor: Colors.black87,
-                    foregroundColor: AppColors().lightBrown,
-                    padding: EdgeInsets.symmetric(vertical: 12),
-                    textStyle: TextStyle(fontSize: 18),
-                  ),
-                ),
-              ),
+                );
+              },
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

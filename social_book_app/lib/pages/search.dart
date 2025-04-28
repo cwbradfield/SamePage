@@ -53,7 +53,13 @@ class BookSearchScreenState extends State<BookSearchScreen> {
       backgroundColor: AppColors().lightBrown,
       appBar: AppBar(
         backgroundColor: AppColors().lightBrown,
-        title: Text("Search Books"),
+        title: Text(
+          "Search Books",
+          style: TextStyle(
+              color: AppColors().darkBrown,
+              fontSize: 28,
+              fontWeight: FontWeight.bold),
+        ),
       ),
       body: Padding(
         padding: EdgeInsets.all(16),

@@ -30,6 +30,7 @@ class SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
       if (existingRequest.docs.isNotEmpty) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
+              backgroundColor: AppColors().darkBrown,
               content: Text("Friend request already sent!",
                   style:
                       TextStyle(color: AppColors().lightBrown, fontSize: 24))),
@@ -45,10 +46,11 @@ class SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
+            backgroundColor: AppColors().darkBrown,
             content: Text(
-          "Friend request sent!",
-          style: TextStyle(color: AppColors().lightBrown, fontSize: 24),
-        )),
+              "Friend request sent!",
+              style: TextStyle(color: AppColors().lightBrown, fontSize: 24),
+            )),
       );
     } catch (e) {
       debugPrint('Error sending request: $e');
@@ -126,9 +128,17 @@ class SendFriendRequestScreenState extends State<SendFriendRequestScreen> {
                     String uid = user.id;
 
                     return ListTile(
-                      leading: CircleAvatar(child: Icon(Icons.person)),
+                      leading: CircleAvatar(
+                        backgroundColor: AppColors().darkBrown,
+                        child:
+                            Icon(Icons.person, color: AppColors().lightBrown),
+                      ),
                       title: Text(email),
                       trailing: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors().darkBrown,
+                          foregroundColor: AppColors().lightBrown,
+                        ),
                         onPressed: () => sendFriendRequest(uid),
                         child: Text("Add Friend"),
                       ),

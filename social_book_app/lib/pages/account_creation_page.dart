@@ -25,7 +25,7 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
       builder: (context) {
         return Center(
           child: CircularProgressIndicator(
-            color: AppColors().lightBrown,
+            color: AppColors().darkBrown,
           ),
         );
       },

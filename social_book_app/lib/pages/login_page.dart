@@ -24,7 +24,7 @@ class _LoginPageState extends State<LoginPage> {
       builder: (context) {
         return Center(
           child: CircularProgressIndicator(
-            color: AppColors().lightBrown,
+            color: AppColors().darkBrown,
           ),
         );
       },

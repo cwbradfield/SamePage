@@ -39,7 +39,8 @@ class FriendProfileScreen extends StatelessWidget {
                 height: 40,
                 child: Text(
                   title.isNotEmpty ? title : "No title",
-                  style: TextStyle(fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.bold),
                   textAlign: TextAlign.center,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
@@ -78,13 +79,14 @@ class FriendProfileScreen extends StatelessWidget {
             FirebaseFirestore.instance.collection('Users').doc(friendUid).get(),
         builder: (context, snapshot) {
           if (!snapshot.hasData) {
-            return Center(child: CircularProgressIndicator());
+            return Center(
+                child: CircularProgressIndicator(
+              color: AppColors().darkBrown,
+            ));
           }
 
           var friendData = snapshot.data!.data() as Map<String, dynamic>;
           String email = friendData['email'] ?? "Unknown User";
-          List<dynamic> reviews = friendData['reviews'] ?? [];
-          List<dynamic> recommendations = friendData['recommendations'] ?? [];
           List<dynamic> favoriteBooks = friendData['favoriteBooks'] ?? [];
 
           return SingleChildScrollView(
@@ -92,23 +94,25 @@ class FriendProfileScreen extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  email,
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                  ),
+                Row(
+                  children: [
+                    Icon(
+                      Icons.person,
+                      color: AppColors().darkBrown,
+                      size: 48,
+                    ),
+                    SizedBox(width: 8),
+                    Text(
+                      email,
+                      style: TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
                 ),
-                SizedBox(height: 8),
-                Text(
-                  "Email: $email",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey[700],
-                  ),
-                ),
-                SizedBox(height: 20),
+                SizedBox(height: 40),
 
                 // Favorite Books Section
                 Text(
@@ -116,22 +120,25 @@ class FriendProfileScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors().darkBrown,
                   ),
                 ),
                 SizedBox(height: 10),
                 if (favoriteBooks.isEmpty)
-                  Card(
-                    child: Padding(
-                      padding: EdgeInsets.all(16),
-                      child: Text(
-                        "No favorite books yet.",
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[700],
+                  Column(
+                    children: [
+                      SizedBox(height: 30),
+                      Center(
+                        child: Text(
+                          "No favorite books yet",
+                          style: TextStyle(
+                            fontSize: 16,
+                            color: Colors.black,
+                          ),
                         ),
                       ),
-                    ),
+                      SizedBox(height: 30),
+                    ],
                   )
                 else
                   SizedBox(
@@ -172,88 +179,92 @@ class FriendProfileScreen extends StatelessWidget {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                    color: AppColors().darkBrown,
                   ),
                 ),
                 SizedBox(height: 10),
-                reviews.isEmpty
-                    ? Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
+                Container(
+                  height: 300, // Fixed height for the reviews section
+                  child: StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('Reviews')
+                        .where('userId', isEqualTo: friendUid)
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Center(
+                            child: CircularProgressIndicator(
+                          color: AppColors().darkBrown,
+                        ));
+                      }
+
+                      if (snapshot.hasError) {
+                        return Center(
+                          child: Text(
+                            "Error loading reviews",
+                            style: TextStyle(color: Colors.red),
+                          ),
+                        );
+                      }
+
+                      if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                        return Center(
                           child: Text(
                             "No reviews yet.",
                             style: TextStyle(
                               fontSize: 16,
-                              color: Colors.grey[700],
+                              color: Colors.black,
                             ),
                           ),
-                        ),
-                      )
-                    : Column(
-                        children: reviews.map((review) {
+                        );
+                      }
+
+                      var reviews = snapshot.data!.docs;
+                      return ListView.builder(
+                        itemCount: reviews.length,
+                        itemBuilder: (context, index) {
+                          var review = reviews[index];
+                          String bookTitle =
+                              review['bookTitle'] ?? 'Unknown Book';
+                          String reviewText = review['review'] ?? '';
+
+                          // Limit review text to 100 characters
+                          String previewText = reviewText.length > 100
+                              ? reviewText.substring(0, 100) + '...'
+                              : reviewText;
+
                           return Card(
-                            child: ListTile(
-                              title: Text(
-                                review['title'],
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Text(review['review']),
-                              trailing: Text(
-                                "⭐ ${review['rating']}",
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.amber,
-                                ),
+                            margin: EdgeInsets.only(bottom: 8),
+                            child: Padding(
+                              padding: EdgeInsets.all(12),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    bookTitle,
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.bold,
+                                      color: AppColors().darkBrown,
+                                    ),
+                                  ),
+                                  SizedBox(height: 8),
+                                  Text(
+                                    previewText,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.black87,
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
                           );
-                        }).toList(),
-                      ),
-                SizedBox(height: 20),
-
-                // Recommendations Section
-                Text(
-                  "📚 Book Recommendations",
-                  style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black87,
+                        },
+                      );
+                    },
                   ),
                 ),
-                SizedBox(height: 10),
-                recommendations.isEmpty
-                    ? Card(
-                        child: Padding(
-                          padding: EdgeInsets.all(16),
-                          child: Text(
-                            "No recommendations yet.",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.grey[700],
-                            ),
-                          ),
-                        ),
-                      )
-                    : Column(
-                        children: recommendations.map((book) {
-                          return Card(
-                            child: ListTile(
-                              leading: Icon(
-                                Icons.book,
-                                color: Colors.brown[700],
-                              ),
-                              title: Text(
-                                book,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
               ],
             ),
           );
