@@ -29,6 +29,8 @@ class _LoginPageState extends State<LoginPage> {
         );
       },
     );
+    await Future.delayed(Duration(seconds: 1));
+    Navigator.of(context).pop();
 
     try {
       await FirebaseAuth.instance.signInWithEmailAndPassword(
@@ -112,10 +114,6 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 SizedBox(
                   height: 10,
-                ),
-                Text(
-                  'Forgot Password?',
-                  style: TextStyle(color: Colors.white),
                 ),
                 SizedBox(
                   height: 30,

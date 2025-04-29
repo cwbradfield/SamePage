@@ -30,6 +30,8 @@ class _AccountCreationPageState extends State<AccountCreationPage> {
         );
       },
     );
+    await Future.delayed(Duration(seconds: 1));
+    Navigator.of(context).pop();
 
     try {
       if (passwordController.text == confirmPasswordController.text) {
